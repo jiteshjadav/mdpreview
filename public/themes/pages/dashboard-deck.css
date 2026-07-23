@@ -1,0 +1,274 @@
+/* Layout B: Dashboard Deck (Modular Widget Panel Style) */
+:root {
+  --bg-color: #f1f5f9;
+  --card-bg: #ffffff;
+  --card-bg-hover: #f8fafc;
+  --text-color: #1e293b;
+  --text-muted: #64748b;
+  --primary: #6366f1;
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 4px 10px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+
+  /* Status Colors */
+  --green: #10b981; --green-bg: rgba(16, 185, 129, 0.06); --green-border: rgba(16, 185, 129, 0.18);
+  --amber: #f59e0b; --amber-bg: rgba(245, 158, 11, 0.06); --amber-border: rgba(245, 158, 11, 0.18);
+  --red: #ef4444;   --red-bg: rgba(239, 68, 68, 0.06);   --red-border: rgba(239, 68, 68, 0.18);
+  --blue: #3b82f6;  --blue-bg: rgba(59, 130, 246, 0.06);  --blue-border: rgba(59, 130, 246, 0.18);
+}
+
+body.theme-body {
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.7;
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.doc-header {
+  border-bottom: 1px solid var(--border-color);
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0.75rem 0;
+}
+
+.header-container {
+  max-width: 1320px;
+  width: 92%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.brand { display: flex; align-items: center; gap: 0.75rem; }
+.logo-icon { font-size: 1.3rem; }
+.doc-title { font-size: 1.15rem; font-weight: 750; color: inherit; }
+.header-actions { display: flex; gap: 0.75rem; }
+.btn-action {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-action:hover { background: var(--card-bg-hover); border-color: var(--primary); }
+
+.doc-wrapper {
+  max-width: 1320px;
+  width: 92%;
+  margin: 2.5rem auto;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 3.5rem;
+}
+
+@media (max-width: 992px) {
+  .doc-wrapper { grid-template-columns: 1fr; gap: 2rem; }
+  .toc-sidebar { display: none; }
+}
+
+.toc-sidebar {
+  position: sticky;
+  top: 5rem;
+  height: fit-content;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+.toc-header { font-weight: 700; font-size: 0.8rem; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.toc-nav ul { list-style: none; padding: 0; margin: 0; }
+.toc-nav li { margin-bottom: 0.5rem; font-size: 0.825rem; }
+.toc-nav a { color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+.toc-nav a:hover { color: var(--primary); }
+
+.main-content { min-width: 0; }
+
+.markdown-body {
+  font-size: 1rem;
+}
+
+/* MODULAR DASHBOARD CARDS: Wraps all headings and sections into independent clean floating dashboard cards */
+.markdown-body h1 {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  border-bottom: 3.5px solid var(--primary);
+  padding-bottom: 0.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.markdown-body h2 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 20px;
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+  border-left: 5px solid var(--primary);
+}
+
+.markdown-body h3 {
+  font-size: 1.15rem;
+  font-weight: 650;
+  color: var(--primary);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1.5px dashed var(--border-color);
+  padding-bottom: 4px;
+}
+
+.markdown-body p { margin-bottom: 1.25rem; color: #334155; }
+.markdown-body ul, .markdown-body ol { margin-bottom: 1.25rem; padding-left: 1.5rem; }
+.markdown-body li { margin-bottom: 0.35rem; }
+.markdown-body a { color: var(--primary); text-decoration: none; font-weight: 600; border-bottom: 1.5px solid var(--primary); }
+.markdown-body a:hover { opacity: 0.85; background: rgba(99, 102, 241, 0.03); }
+
+.markdown-body code {
+  font-family: monospace;
+  font-size: 0.88em;
+  background: #e2e8f0;
+  color: #0f172a;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+}
+
+.markdown-body pre {
+  position: relative;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.markdown-body pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.9em;
+  color: #e2e8f0;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: #1e293b;
+  border: 1px solid var(--primary);
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.35rem;
+  cursor: pointer;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+.markdown-body th, .markdown-body td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); text-align: left; }
+.markdown-body th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
+
+/* Custom details cards support */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  display: block;
+  box-shadow: var(--shadow-sm);
+}
+.card-green  { border-left: 4px solid var(--green); }
+.card-amber  { border-left: 4px solid var(--amber); }
+.card-red    { border-left: 4px solid var(--red); }
+.card-blue   { border-left: 4px solid var(--blue); }
+
+.card-header-wrapper { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.card-content { margin-top: 20px; }
+.card summary { cursor: pointer; list-style: none; outline: none; }
+.card summary::-webkit-details-marker { display: none; }
+.card summary .chevron { font-size: 0.85rem; color: var(--text-muted); transition: transform 0.2s ease; margin-left: 12px; }
+details[open] > summary .chevron { transform: rotate(90deg); }
+
+/* Badges & Alerts */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.badge-green { background-color: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.badge-amber { background-color: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.badge-red   { background-color: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-border); }
+.badge-blue  { background-color: var(--blue-bg);  color: var(--blue);  border: 1px solid var(--blue-border); }
+
+.status { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+.status-secure   { background-color: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.status-warning  { background-color: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.status-risk     { background-color: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-border); }
+.status-info     { background-color: var(--blue-bg);  color: var(--blue);  border: 1px solid var(--blue-border); }
+
+.alert-box {
+  background-color: var(--red-bg);
+  border-left: 4px solid var(--red);
+  padding: 14px 20px;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+  border-top: 1px solid var(--red-border);
+  border-right: 1px solid var(--red-border);
+  border-bottom: 1px solid var(--red-border);
+  box-shadow: var(--shadow-sm);
+}
+.alert-title { font-weight: 700; color: var(--red); margin-bottom: 4px; }
+
+/* Fullscreen support for zoom diagram */
+.mermaid-pan-zoom-container.fullscreen-active {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  z-index: 9999 !important;
+  background: var(--bg-color) !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+.doc-footer {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
