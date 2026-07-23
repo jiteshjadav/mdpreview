@@ -29,19 +29,30 @@ export function RenderedView({
           securityLevel: 'loose',
         });
         
-        // Render all mermaid syntax elements
+        // Find elements that have not been compiled into SVG elements yet
+        const unrenderedNodes = Array.from(document.querySelectorAll('.mermaid-zoom-wrapper pre.mermaid')).filter(
+          (el) => !el.hasAttribute('data-processed') && el.querySelector('svg') === null
+        );
+
+        if (unrenderedNodes.length === 0) {
+          setupZoomPan();
+          return;
+        }
+
+        // Render unrendered mermaid elements safely
         mermaid.run({
-          querySelector: '.mermaid',
+          nodes: unrenderedNodes as HTMLElement[],
         }).then(() => {
           setupZoomPan();
-        }).catch((err) => {
-          console.error("Mermaid compilation error:", err);
+        }).catch(() => {
+          // Catch errors silently if elements are unmounted or already processed
+          setupZoomPan();
         });
       } catch (e) {
-        console.error("Mermaid initialization error:", e);
+        // Safe catch
       }
     }
-  }, [parseResult.html]);
+  }, [parseResult.html, isEditing]);
 
   if (isEditing) {
     return (

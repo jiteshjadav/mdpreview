@@ -7,7 +7,7 @@ import JSZip from 'jszip';
 import { ParseResult } from '@/lib/engine/converter';
 import { generateStandaloneHtml } from '@/lib/export/htmlExport';
 import { ThemeSwitcher, ThemeType } from './ThemeSwitcher';
-import { TRANSLATIONS } from '@/app/page';
+import { TRANSLATIONS } from './WorkspaceApp';
 
 export interface FloatingDockProps {
   parseResult: ParseResult;
@@ -288,7 +288,7 @@ export function FloatingDock({
             className="hidden sm:flex items-center gap-2 cursor-pointer active:scale-95 transition-transform shrink-0 select-none"
             title="Go to upload screen"
           >
-            <img src="logo.png" alt="MD Preview Logo" className={`h-9 w-auto object-contain transition-all rounded px-2 py-0.5 ${
+            <img src="/logo.png" alt="MD Preview Logo" className={`h-9 w-auto object-contain transition-all rounded px-2 py-0.5 ${
               appTheme === 'dark' ? 'bg-white/95 shadow-sm' : ''
             }`} />
           </div>

@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://mdpreview.ca'),
   title: "MD Preview - Instant Markdown & MDX HTML Exporter",
   description: "Free client-side Markdown & MDX viewer and HTML exporter. / Visualiseur Markdown et MDX 100% local. Drag, drop, or paste Markdown (.md) to convert and download as fully responsive, styled standalone HTML or PDF files.",
   keywords: [

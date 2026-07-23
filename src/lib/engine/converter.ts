@@ -187,7 +187,7 @@ function transformMermaidBlocks(html: string): string {
       .replace(/&quot;/g, '"')
       .replace(/&#039;/g, "'");
 
-    return `<div class="mermaid-pan-zoom-container select-none relative overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center p-4 cursor-grab active:cursor-grabbing my-6" style="height: 400px; width: 100%;">
+    return `<div class="mermaid-pan-zoom-container select-none relative overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center p-4 cursor-grab active:cursor-grabbing my-6" style="height: 680px; width: 100%;">
       <div class="mermaid-zoom-wrapper transition-transform duration-100 ease-out origin-center scale-100 translate-x-0 translate-y-0" style="transform: scale(1) translate(0px, 0px);">
         <pre class="mermaid bg-transparent border-none shadow-none m-0 p-0 overflow-visible">${decodedCode}</pre>
       </div>
