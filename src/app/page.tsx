@@ -249,6 +249,17 @@ export default function Home() {
     });
   };
  
+  const handleSelectFile = (fileId: string) => {
+    setActiveFileId(fileId);
+    const selectedFile = files.find((f) => f.id === fileId);
+    if (selectedFile) {
+      const isHtml = selectedFile.name.toLowerCase().endsWith('.html') || selectedFile.name.toLowerCase().endsWith('.htm');
+      if (isHtml) {
+        setIsEditing(false);
+      }
+    }
+  };
+
   const handleRenameFile = (fileId: string, newName: string) => {
     let cleanName = newName.trim();
     if (!cleanName) return;
@@ -297,7 +308,7 @@ export default function Home() {
         zip.file(file.name.replace(/\.(mdx|md|txt)$/, '') + '.html', standaloneHtml);
       }
       if (file.content) {
-        zip.file(file.name, file.content);
+        zip.file('md/' + file.name, file.content);
       }
     });
  
@@ -699,7 +710,8 @@ export default function Home() {
 
         {/* Full-Page HTML Output Screen (State B) */}
         {hasContent && activeFile && (
-          <div className="animate-in fade-in duration-300">
+          /* preview-isolate: excludes this subtree from the Tailwind dark variant so page theme CSS is never overridden by app dark mode */
+          <div className="animate-in fade-in duration-300 preview-isolate" style={{ colorScheme: 'light' }}>
             <RenderedView
               parseResult={activeFile.parseResult!}
               rawMarkdown={activeFile.content}
@@ -723,7 +735,7 @@ export default function Home() {
           onBackToUpload={handleBackToUpload}
           files={files.map(f => ({ id: f.id, name: f.name, content: f.content, html: f.parseResult?.html }))}
           activeFileId={activeFileId}
-          onSelectFile={setActiveFileId}
+          onSelectFile={handleSelectFile}
           onRemoveFile={handleRemoveFile}
           onRenameFile={handleRenameFile}
           onAddFiles={handleFilesLoaded}
@@ -796,7 +808,7 @@ export default function Home() {
               </button>
               <button
                 onClick={handleExportAndExit}
-                className="w-full sm:w-auto px-4 py-2 rounded-2xl text-xs font-bold bg-teal-650 text-white hover:bg-teal-700 transition-all cursor-pointer shadow-md shadow-teal-500/20 select-none flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2 rounded-2xl text-xs font-bold bg-teal-600 text-white hover:bg-teal-700 transition-all cursor-pointer shadow-md shadow-teal-500/20 select-none flex items-center justify-center gap-1.5"
               >
                 <Download className="w-3.5 h-3.5" />
                 {lang === 'en' ? 'Export & Exit' : 'Exporter & Quitter'}

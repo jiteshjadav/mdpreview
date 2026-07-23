@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *):not(.preview-isolate, .preview-isolate *));
 
 @layer base {
   :root {
@@ -10,6 +10,9 @@
     --text-secondary: #475569;
     --border-color: #e2e8f0;
     --indigo-primary: #4f46e5;
+    /* Page-theme defaults (overridden by page theme CSS link) */
+    --text-color: #1a1a1a;
+    --bg-color: #ffffff;
   }
 
   .dark {
@@ -31,8 +34,10 @@
 }
 
 /* Premium Typography for Markdown Body */
+/* Note: uses page-theme vars (--text-color, --border-color) with app-level fallbacks.
+   The document preview card is always rendered in light mode regardless of app theme. */
 .markdown-body {
-  color: var(--text-primary);
+  color: var(--text-color, var(--text-primary, #1a1a1a));
   font-size: 1.05rem;
   line-height: 1.8;
   font-family: 'Inter', system-ui, sans-serif;
@@ -49,8 +54,8 @@
   letter-spacing: -0.03em;
   margin-top: 2rem;
   margin-bottom: 1.25rem;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-color);
+  color: var(--text-color, var(--text-primary, #1a1a1a));
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
   padding-bottom: 0.5rem;
   line-height: 1.25;
 }
@@ -61,8 +66,8 @@
   letter-spacing: -0.02em;
   margin-top: 2.25rem;
   margin-bottom: 1rem;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-color);
+  color: var(--text-color, var(--text-primary, #1a1a1a));
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
   padding-bottom: 0.4rem;
   line-height: 1.3;
 }
@@ -73,7 +78,7 @@
   letter-spacing: -0.01em;
   margin-top: 1.75rem;
   margin-bottom: 0.75rem;
-  color: var(--text-primary);
+  color: var(--text-color, var(--text-primary, #1a1a1a));
 }
 
 .markdown-body p {
@@ -118,11 +123,9 @@
   border-radius: 0.4em;
 }
 
-.dark .markdown-body code {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #ff8a65;
-}
+/* Intentionally removed: .dark .markdown-body code override.
+   The document preview is always rendered in light mode (page theme)
+   regardless of the active app theme (dark/light). */
 
 .markdown-body pre {
   position: relative;
@@ -136,9 +139,8 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.dark .markdown-body pre {
-  border-color: rgba(255, 255, 255, 0.08);
-}
+/* Intentionally removed: .dark .markdown-body pre override.
+   Document preview is always light-mode rendered (page theme). */
 
 .markdown-body pre code {
   background: transparent !important;
@@ -177,9 +179,8 @@
   font-weight: 600;
 }
 
-.dark .markdown-body th {
-  background: rgba(255, 255, 255, 0.03);
-}
+/* Intentionally removed: .dark .markdown-body th override.
+   Document preview is always light-mode rendered (page theme). */
 
 .markdown-body blockquote {
   border-left: 4px solid var(--indigo-primary);
@@ -228,5 +229,131 @@
 }
 .app-accent-border {
   border-color: var(--app-accent-border);
+}
+
+/* ══════════════════════════════════════════════════════
+   MERMAID DIAGRAM PAN/ZOOM & FULLSCREEN OVERLAY
+══════════════════════════════════════════════════════ */
+
+.mermaid-pan-zoom-container {
+  transition: all 0.3s ease;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+.mermaid-pan-zoom-container:active {
+  cursor: grabbing;
+}
+
+.mermaid-zoom-wrapper {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.mermaid-zoom-wrapper pre.mermaid {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.mermaid svg {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+}
+
+/* Control buttons style overlay */
+.mermaid-pan-zoom-container .absolute.top-2.right-2 {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 10px !important;
+  padding: 3px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  display: flex !important;
+  gap: 2px !important;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.mermaid-pan-zoom-container .absolute.top-2.right-2 button {
+  background: transparent !important;
+  border: none !important;
+  color: #475569 !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 5px 8px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: background 0.15s, color 0.15s !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+.mermaid-pan-zoom-container .absolute.top-2.right-2 button:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Fullscreen mode active state */
+.mermaid-pan-zoom-container.fullscreen-active {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(20px);
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  animation: fadeInFullscreen 0.25s ease-out;
+}
+
+/* In dark mode */
+.dark .mermaid-pan-zoom-container {
+  background: #090d16;
+  border-color: #1e293b;
+}
+
+.dark .mermaid-pan-zoom-container.fullscreen-active {
+  background: rgba(11, 15, 25, 0.98) !important;
+}
+
+.dark .mermaid-pan-zoom-container .absolute.top-2.right-2 {
+  background: rgba(17, 24, 39, 0.9) !important;
+  border-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+.dark .mermaid-pan-zoom-container .absolute.top-2.right-2 button {
+  color: #94a3b8 !important;
+}
+
+.dark .mermaid-pan-zoom-container .absolute.top-2.right-2 button:hover {
+  background: #1f2937 !important;
+  color: #f8fafc !important;
+}
+
+@keyframes fadeInFullscreen {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
 

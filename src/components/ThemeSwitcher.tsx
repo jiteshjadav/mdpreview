@@ -6,7 +6,9 @@ import { LayoutTemplate } from 'lucide-react';
 export type ThemeType = 
   | 'split-book' 
   | 'dashboard-deck' 
-  | 'stepped-progress';
+  | 'stepped-progress'
+  | 'warm-editorial'
+  | 'clean-html';
 
 export interface ThemeOption {
   id: ThemeType;
@@ -34,6 +36,18 @@ export const THEME_OPTIONS: ThemeOption[] = [
     description: 'Linear timeline axis with numbered step icons',
     previewColor: 'bg-teal-50 border-teal-600/30 text-teal-900',
   },
+  {
+    id: 'warm-editorial',
+    name: 'Warm Editorial',
+    description: 'Human-friendly serif magazine style with warm amber tones',
+    previewColor: 'bg-amber-50 border-orange-200 text-orange-900',
+  },
+  {
+    id: 'clean-html',
+    name: 'Clean HTML',
+    description: 'Simple web document style (GitHub Pages / MDX default)',
+    previewColor: 'bg-white border-slate-300 text-slate-700',
+  },
 ];
 
 export interface ThemeSwitcherProps {
@@ -53,15 +67,19 @@ export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, 
   };
 
   const getLocalizedName = (id: ThemeType) => {
-    if (id === 'split-book') return id === 'split-book' ? 'Split Book' : 'Split Book';
+    if (id === 'split-book') return 'Split Book';
     if (id === 'dashboard-deck') return lang === 'en' ? 'Dashboard Deck' : 'Tableau de Bord';
-    return lang === 'en' ? 'Stepped Guide' : 'Guide par Étapes';
+    if (id === 'stepped-progress') return lang === 'en' ? 'Stepped Guide' : 'Guide par Étapes';
+    if (id === 'warm-editorial') return lang === 'en' ? 'Warm Editorial' : 'Éditorial Chaleureux';
+    return lang === 'en' ? 'Clean HTML' : 'HTML Simple';
   };
 
   const getLocalizedDesc = (id: ThemeType) => {
     if (id === 'split-book') return lang === 'en' ? 'Minimal two-column split book (Stripe/Linear style)' : 'Livre séparé en deux colonnes (Style Stripe)';
     if (id === 'dashboard-deck') return lang === 'en' ? 'Modular floating widget cards with shadows' : 'Cartes widgets flottantes modulaires avec ombres';
-    return lang === 'en' ? 'Linear timeline axis with numbered step icons' : 'Axe chronologique linéaire avec étapes numérotées';
+    if (id === 'stepped-progress') return lang === 'en' ? 'Linear timeline axis with numbered step icons' : 'Axe chronologique linéaire avec étapes numérotées';
+    if (id === 'warm-editorial') return lang === 'en' ? 'Human-friendly serif magazine style with warm tones' : 'Style magazine serif chaleureux et humain';
+    return lang === 'en' ? 'Simple web document style (GitHub Pages / MDX)' : 'Style document web simple (GitHub Pages / MDX)';
   };
 
   return (

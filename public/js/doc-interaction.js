@@ -62,26 +62,45 @@
   var layoutToggleBtn = document.getElementById('layoutToggleBtn');
   var layoutDropdownMenu = document.getElementById('layoutDropdownMenu');
   var htmlEl = document.documentElement;
- 
+
+  // Grid-capable themes: these use a 2-column doc-wrapper with a collapsible TOC sidebar.
+  // All other themes get data-layout="column" (no sidebar).
+  // To register a new grid-capable theme, add its ID here.
+  var GRID_THEMES = ['split-book', 'dashboard-deck', 'stepped-progress'];
+
+  function getLayout(themeId) {
+    return GRID_THEMES.indexOf(themeId) !== -1 ? 'grid' : 'column';
+  }
+
   if (layoutToggleBtn && layoutDropdownMenu) {
     layoutToggleBtn.onclick = function(e) {
       e.stopPropagation();
       var open = layoutDropdownMenu.style.display === 'block';
       layoutDropdownMenu.style.display = open ? 'none' : 'block';
     };
- 
+
     window.addEventListener('click', function() {
       layoutDropdownMenu.style.display = 'none';
     });
- 
+
     layoutDropdownMenu.onclick = function(e) {
       e.stopPropagation();
     };
   }
- 
+
   function switchLayout(nextTheme) {
     htmlEl.setAttribute('data-theme', nextTheme);
- 
+
+    // Update data-layout so chrome.css grid/column rules apply correctly
+    var nextLayout = getLayout(nextTheme);
+    htmlEl.setAttribute('data-layout', nextLayout);
+
+    // If switching to a column theme, collapse the sidebar
+    if (nextLayout === 'column') {
+      var docWrapper = document.querySelector('.doc-wrapper');
+      if (docWrapper) docWrapper.classList.remove('toc-open');
+    }
+
     // Update active state in dropdown options
     document.querySelectorAll('.layout-option-btn').forEach(function(btn) {
       if (btn.getAttribute('data-theme-val') === nextTheme) {
@@ -90,20 +109,20 @@
         btn.classList.remove('active');
       }
     });
- 
-    // Update linked CSS path
-    var link = document.querySelector('link[href*="/themes/pages/"]');
-    if (link) {
-      var href = link.getAttribute('href');
+
+    // Swap only the theme-specific CSS link (not chrome.css)
+    var themeLink = document.querySelector('link[data-role="theme-css"]');
+    if (themeLink) {
+      var href = themeLink.getAttribute('href');
       var basePart = href.split('/themes/pages/')[0];
-      link.setAttribute('href', basePart + '/themes/pages/' + nextTheme + '.css');
+      themeLink.setAttribute('href', basePart + '/themes/pages/' + nextTheme + '.css');
     }
   }
- 
-  // Set initial active state based on current theme value
+
+  // Set initial active state based on current data-theme on <html>
   var initialTheme = htmlEl.getAttribute('data-theme') || 'split-book';
   switchLayout(initialTheme);
- 
+
   document.querySelectorAll('.layout-option-btn').forEach(function(btn) {
     btn.onclick = function() {
       var val = btn.getAttribute('data-theme-val');
@@ -113,6 +132,38 @@
       }
     };
   });
+
+  // Title chip → workspace files dropdown
+  var titleFilesBtn = document.getElementById('titleFilesBtn');
+  var filesDropdownMenu = document.getElementById('filesDropdownMenu');
+
+  if (titleFilesBtn && filesDropdownMenu) {
+    titleFilesBtn.onclick = function(e) {
+      e.stopPropagation();
+      var open = filesDropdownMenu.style.display === 'block';
+      // Close layout dropdown if open
+      if (layoutDropdownMenu) layoutDropdownMenu.style.display = 'none';
+      filesDropdownMenu.style.display = open ? 'none' : 'block';
+    };
+
+    // Hover effect on title chip
+    titleFilesBtn.addEventListener('mouseover', function() {
+      titleFilesBtn.style.background = '#f8fafc';
+      titleFilesBtn.style.borderColor = '#94a3b8';
+    });
+    titleFilesBtn.addEventListener('mouseout', function() {
+      titleFilesBtn.style.background = 'transparent';
+      titleFilesBtn.style.borderColor = '#e2e8f0';
+    });
+
+    window.addEventListener('click', function() {
+      filesDropdownMenu.style.display = 'none';
+    });
+
+    filesDropdownMenu.onclick = function(e) {
+      e.stopPropagation();
+    };
+  }
 
   // Setup Zoom & Pan for Mermaid Diagrams
   function setupMermaidZoomPan() {
@@ -138,7 +189,7 @@
       if (zoomInBtn) {
         zoomInBtn.onclick = function(e) {
           e.stopPropagation();
-          scale = Math.min(scale + 0.15, 3);
+          scale = Math.min(scale + 0.15, 8);
           updateTransform();
         };
       }
@@ -184,7 +235,7 @@
         e.preventDefault();
         var zoomFactor = 0.08;
         if (e.deltaY < 0) {
-          scale = Math.min(scale + zoomFactor, 3);
+          scale = Math.min(scale + zoomFactor, 8);
         } else {
           scale = Math.max(scale - zoomFactor, 0.4);
         }

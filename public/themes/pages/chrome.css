@@ -1,0 +1,438 @@
+/*
+ * chrome.css — Shared UI chrome for all MD Preview exported documents.
+ *
+ * This file owns the header, sidebar, TOC, navigation buttons, dropdowns,
+ * callout and badge components. It is ALWAYS loaded alongside any page theme.
+ *
+ * Theme CSS files (split-book.css, etc.) must NOT define:
+ *   .doc-header, .header-container, .brand, .btn-action, .btn-toc-toggle,
+ *   .toc-sidebar, .toc-nav, .toc-header, .doc-footer
+ *
+ * Grid-layout detection:
+ *   htmlExport.ts sets data-layout="grid" on <html> for sidebar-capable themes.
+ *   data-layout="column" for single-column themes.
+ *   doc-interaction.js keeps this in sync when the user switches styles.
+ *
+ * To add a NEW grid-sidebar theme: set data-layout="grid" in htmlExport.ts.
+ * No other file needs to change.
+ */
+
+/* ══════════════════════════════════════════════════════
+   HEADER — identical across all themes
+══════════════════════════════════════════════════════ */
+
+.doc-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  padding: 0 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+}
+
+.header-container {
+  max-width: 1280px !important;
+  width: 94% !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  height: 52px !important;
+}
+
+.brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.6rem !important;
+  min-width: 0 !important;
+}
+
+.doc-title {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 360px !important;
+}
+
+.header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  flex-shrink: 0 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   ACTION BUTTONS — all header buttons look the same
+══════════════════════════════════════════════════════ */
+
+.btn-action {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #334155 !important;
+  padding: 0.35rem 0.85rem !important;
+  border-radius: 8px !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.15s, border-color 0.15s, color 0.15s !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+.btn-action:hover {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+/* TOC menu toggle — slightly different: transparent by default */
+.btn-toc-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  background: transparent !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+  padding: 0.35rem 0.75rem !important;
+  border-radius: 8px !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.15s, border-color 0.15s, color 0.15s !important;
+}
+.btn-toc-toggle:hover {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+/* Hide the TOC toggle on column-layout themes */
+html[data-layout="column"] #tocToggleBtn {
+  display: none !important;
+}
+
+.btn-icon {
+  width: 14px !important;
+  height: 14px !important;
+  stroke-width: 2.2 !important;
+  flex-shrink: 0 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   TOC SIDEBAR — grid themes: slide-in panel
+                 column themes: completely hidden
+══════════════════════════════════════════════════════ */
+
+/* Base reset — remove per-theme decorations */
+.toc-sidebar {
+  background: #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+/* Column themes: sidebar doesn't exist */
+html[data-layout="column"] .toc-sidebar {
+  display: none !important;
+}
+html[data-layout="column"] .doc-wrapper {
+  /* Consistent reading width for all column themes */
+  max-width: 800px !important;
+  width: 94% !important;
+  margin: 2rem auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Grid themes: sidebar starts collapsed */
+html[data-layout="grid"] .doc-wrapper {
+  grid-template-columns: 0px 1fr !important;
+  transition: grid-template-columns 0.25s ease-in-out !important;
+  /* Consistent max-width: 260px sidebar + ~800px content */
+  max-width: 1080px !important;
+  width: 94% !important;
+  margin: 2rem auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+html[data-layout="grid"] .doc-wrapper.toc-open {
+  grid-template-columns: 260px 1fr !important;
+}
+
+html[data-layout="grid"] .toc-sidebar {
+  width: 0 !important;
+  padding: 0 !important;
+  border-right: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: width 0.25s ease-in-out,
+              padding 0.25s ease-in-out,
+              opacity 0.25s ease-in-out,
+              visibility 0.25s ease-in-out !important;
+}
+html[data-layout="grid"] .doc-wrapper.toc-open .toc-sidebar {
+  width: 260px !important;
+  padding: 1.75rem 1.25rem !important;
+  border-right: 1px solid #e2e8f0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   TOC CONTENTS — always the same look
+══════════════════════════════════════════════════════ */
+
+.toc-header {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.09em !important;
+  color: #94a3b8 !important;
+  margin-bottom: 0.85rem !important;
+}
+
+.toc-nav ul { list-style: none !important; padding: 0 !important; margin: 0 !important; }
+.toc-nav li { margin-bottom: 0.45rem !important; }
+.toc-nav li.level-h2 { padding-left: 0 !important; }
+.toc-nav li.level-h3 { padding-left: 0.85rem !important; }
+.toc-nav li.level-h4 { padding-left: 1.6rem !important; }
+.toc-nav a {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  text-decoration: none !important;
+  transition: color 0.12s !important;
+  display: block !important;
+  padding: 0.12rem 0 !important;
+  line-height: 1.4 !important;
+}
+.toc-nav a:hover { color: #1e293b !important; }
+
+/* ══════════════════════════════════════════════════════
+   DROPDOWN MENUS — files switcher & style switcher
+══════════════════════════════════════════════════════ */
+
+.file-link-item { transition: background-color 0.12s, color 0.12s !important; }
+.file-link-item:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.layout-option-btn { transition: background-color 0.12s, color 0.12s !important; }
+.layout-option-btn:hover { background-color: #f1f5f9 !important; }
+.layout-option-btn.active {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+  font-weight: 600 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   CALLOUT COMPONENTS
+══════════════════════════════════════════════════════ */
+
+.callout-component {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.callout-component.callout-info    { border-color: rgba(37,99,235,.25);   background: #eff6ff; color: #1e40af; }
+.callout-component.callout-warning { border-color: rgba(217,119,6,.25);   background: #fffbeb; color: #854d0e; }
+.callout-component.callout-success { border-color: rgba(22,163,74,.25);   background: #f0fdf4; color: #166534; }
+.callout-component.callout-danger  { border-color: rgba(220,38,38,.25);   background: #fef2f2; color: #991b1b; }
+.callout-component h5 {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: inherit;
+}
+
+/* ══════════════════════════════════════════════════════
+   BADGE COMPONENTS
+══════════════════════════════════════════════════════ */
+
+.badge-component {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  margin: 0 0.125rem;
+  vertical-align: middle;
+}
+.badge-component.badge-primary { background: #ede9fe; color: #5b21b6; border-color: #c4b5fd; }
+.badge-component.badge-success { background: #dcfce7; color: #15803d; border-color: #86efac; }
+.badge-component.badge-warning { background: #fef9c3; color: #a16207; border-color: #fde047; }
+.badge-component.badge-danger  { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+/* ══════════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════════ */
+
+.doc-footer {
+  margin-top: 3rem !important;
+  padding-top: 1.25rem !important;
+  border-top: 1px solid #e2e8f0 !important;
+  text-align: center !important;
+  font-size: 0.78rem !important;
+  color: #94a3b8 !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+}
+.doc-footer a { color: #64748b; text-decoration: none; }
+.doc-footer a:hover { text-decoration: underline; }
+
+/* ══════════════════════════════════════════════════════
+   MERMAID DIAGRAM PAN/ZOOM & FULLSCREEN OVERLAY
+══════════════════════════════════════════════════════ */
+
+.mermaid-pan-zoom-container {
+  transition: all 0.3s ease;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+.mermaid-pan-zoom-container:active {
+  cursor: grabbing;
+}
+
+.mermaid-zoom-wrapper {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.mermaid-zoom-wrapper pre.mermaid {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.mermaid svg {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+}
+
+/* Control buttons style overlay */
+.mermaid-pan-zoom-container .absolute.top-2.right-2 {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 10px !important;
+  padding: 3px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  display: flex !important;
+  gap: 2px !important;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.mermaid-pan-zoom-container .absolute.top-2.right-2 button {
+  background: transparent !important;
+  border: none !important;
+  color: #475569 !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 5px 8px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: background 0.15s, color 0.15s !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+.mermaid-pan-zoom-container .absolute.top-2.right-2 button:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Fullscreen mode active state */
+.mermaid-pan-zoom-container.fullscreen-active {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(20px);
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  animation: fadeInFullscreen 0.25s ease-out;
+}
+
+/* In dark mode / dark page theme */
+.dark .mermaid-pan-zoom-container,
+[data-theme="dark"] .mermaid-pan-zoom-container,
+[data-theme="midnight-dark"] .mermaid-pan-zoom-container {
+  background: #090d16;
+  border-color: #1e293b;
+}
+
+.dark .mermaid-pan-zoom-container.fullscreen-active,
+[data-theme="dark"] .mermaid-pan-zoom-container.fullscreen-active,
+[data-theme="midnight-dark"] .mermaid-pan-zoom-container.fullscreen-active {
+  background: rgba(11, 15, 25, 0.98) !important;
+}
+
+.dark .mermaid-pan-zoom-container .absolute.top-2.right-2,
+[data-theme="dark"] .mermaid-pan-zoom-container .absolute.top-2.right-2,
+[data-theme="midnight-dark"] .mermaid-pan-zoom-container .absolute.top-2.right-2 {
+  background: rgba(17, 24, 39, 0.9) !important;
+  border-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+.dark .mermaid-pan-zoom-container .absolute.top-2.right-2 button,
+[data-theme="dark"] .mermaid-pan-zoom-container .absolute.top-2.right-2 button,
+[data-theme="midnight-dark"] .mermaid-pan-zoom-container .absolute.top-2.right-2 button {
+  color: #94a3b8 !important;
+}
+
+.dark .mermaid-pan-zoom-container .absolute.top-2.right-2 button:hover,
+[data-theme="dark"] .mermaid-pan-zoom-container .absolute.top-2.right-2 button:hover,
+[data-theme="midnight-dark"] .mermaid-pan-zoom-container .absolute.top-2.right-2 button:hover {
+  background: #1f2937 !important;
+  color: #f8fafc !important;
+}
+
+@keyframes fadeInFullscreen {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+

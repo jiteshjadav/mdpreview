@@ -121,7 +121,7 @@ function setupZoomPan() {
     if (zoomInBtn) {
       zoomInBtn.onclick = (e) => {
         e.stopPropagation();
-        scale = Math.min(scale + 0.15, 3);
+        scale = Math.min(scale + 0.15, 8);
         updateTransform();
       };
     }
@@ -168,7 +168,7 @@ function setupZoomPan() {
       e.preventDefault();
       const zoomFactor = 0.08;
       if (e.deltaY < 0) {
-        scale = Math.min(scale + zoomFactor, 3);
+        scale = Math.min(scale + zoomFactor, 8);
       } else {
         scale = Math.max(scale - zoomFactor, 0.4);
       }

@@ -59,6 +59,18 @@ export function FloatingDock({
   const [editingFileId, setEditingFileId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
   const [includeMdInZip, setIncludeMdInZip] = useState<boolean>(false);
+
+  const handleConfirmRename = (file: typeof files[number], newBaseName: string) => {
+    const trimmed = newBaseName.trim();
+    if (!trimmed) {
+      setEditingFileId(null);
+      return;
+    }
+    const dotIndex = file.name.lastIndexOf('.');
+    const ext = dotIndex === -1 ? '' : file.name.substring(dotIndex);
+    onRenameFile(file.id, trimmed + ext);
+    setEditingFileId(null);
+  };
   
   const lastScrollY = useRef(0);
  
@@ -127,7 +139,7 @@ export function FloatingDock({
     
     files.forEach((file) => {
       const fileContent = file.content || '';
-      zip.file(file.name, fileContent);
+      zip.file('md/' + file.name, fileContent);
     });
  
     const content = await zip.generateAsync({ type: 'blob' });
@@ -164,7 +176,7 @@ export function FloatingDock({
         zip.file(fileName, standaloneHtml);
       }
       if (includeMdInZip && file.content) {
-        zip.file(file.name, file.content);
+        zip.file('md/' + file.name, file.content);
       }
     });
  
@@ -283,28 +295,54 @@ export function FloatingDock({
  
           <div className="hidden sm:block w-[1px] h-5 app-border shrink-0" />
  
-          {/* Back to Upload */}
-          <button
-            onClick={onBackToUpload}
-            className="flex items-center gap-1.5 px-2.5 py-2 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer shrink-0 border app-bg-hover app-border app-text select-none"
-            title="Back to uploader"
+          {/* Direct File Upload */}
+          <label
+            className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer shrink-0 border app-bg-hover app-border app-text select-none"
+            title="Upload files to workspace"
           >
-            <ArrowLeft className="w-4 h-4 app-accent-text" />
-            <span className="hidden lg:inline">{TRANSLATIONS[lang].upload}</span>
-          </button>
- 
+            <Download className="w-4 h-4 app-accent-text rotate-180" />
+            <span>{lang === 'en' ? 'Upload' : 'Charger'}</span>
+            <input
+              type="file"
+              multiple
+              accept=".md,.mdx,.html,.htm,.txt"
+              onChange={(e) => {
+                if (e.target.files) {
+                  const validFiles = Array.from(e.target.files).filter((f) => {
+                    const ext = f.name.split('.').pop()?.toLowerCase();
+                    return ext === 'md' || ext === 'mdx' || ext === 'html' || ext === 'htm' || ext === 'txt';
+                  });
+                  if (validFiles.length > 0) {
+                    const promises = validFiles.map((file) => {
+                      return new Promise<{ name: string; content: string }>((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          resolve({
+                            name: file.name,
+                            content: (event.target?.result as string) || '',
+                          });
+                        };
+                        reader.onerror = () => {
+                          resolve({ name: file.name, content: '' });
+                        };
+                        reader.readAsText(file);
+                      });
+                    });
+                    Promise.all(promises).then((results) => {
+                      const successFiles = results.filter(r => r.content.length > 0);
+                      if (successFiles.length > 0) {
+                        onAddFiles(successFiles);
+                      }
+                    });
+                  }
+                }
+              }}
+              className="hidden"
+            />
+          </label>
+
           {/* Active Filename Display & Switcher Dropdown */}
           <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-            {files.length > 1 && (
-              <button
-                onClick={handlePrevFile}
-                className="p-1 rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer text-slate-500 dark:text-slate-400 shrink-0"
-                title="Previous file"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            )}
- 
             <div className="relative files-dropdown-container shrink-0 min-w-0">
               <button 
                 onClick={(e) => {
@@ -385,16 +423,14 @@ export function FloatingDock({
                                 onKeyDown={(e) => {
                                   if (e.key === 'Enter') {
                                     e.stopPropagation();
-                                    onRenameFile(file.id, editingName);
-                                    setEditingFileId(null);
+                                    handleConfirmRename(file, editingName);
                                   } else if (e.key === 'Escape') {
                                     e.stopPropagation();
                                     setEditingFileId(null);
                                   }
                                 }}
                                 onBlur={() => {
-                                  onRenameFile(file.id, editingName);
-                                  setEditingFileId(null);
+                                  handleConfirmRename(file, editingName);
                                 }}
                                 className="text-xs px-2 py-0.5 rounded border border-slate-300 dark:border-slate-750 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 outline-none w-full focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all duration-150"
                               />
@@ -412,8 +448,7 @@ export function FloatingDock({
                                 <button
                                   onMouseDown={(e) => {
                                     e.preventDefault();
-                                    onRenameFile(file.id, editingName);
-                                    setEditingFileId(null);
+                                    handleConfirmRename(file, editingName);
                                   }}
                                   className="p-1 rounded text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10 transition-colors cursor-pointer"
                                   title="Confirm Rename"
@@ -435,8 +470,10 @@ export function FloatingDock({
                               <>
                                 <button
                                   onClick={() => {
+                                    const dotIndex = file.name.lastIndexOf('.');
+                                    const baseName = dotIndex === -1 ? file.name : file.name.substring(0, dotIndex);
                                     setEditingFileId(file.id);
-                                    setEditingName(file.name);
+                                    setEditingName(baseName);
                                   }}
                                   className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
                                   title="Rename file"
@@ -519,35 +556,28 @@ export function FloatingDock({
                 </div>
               )}
             </div>
- 
-            {files.length > 1 && (
-              <button
-                onClick={handleNextFile}
-                className="p-1 rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer text-slate-500 dark:text-slate-400 shrink-0"
-                title="Next file"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
           </div>
         </div>
  
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Live Edit Toggle */}
-          <button
-            onClick={onToggleEdit}
-            className={`flex items-center gap-1.5 px-2.5 py-2 sm:px-3.5 sm:py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer select-none shrink-0 ${
-              isEditing
-                ? 'app-primary-btn border-transparent'
-                : 'border app-bg-hover app-border app-text'
-            }`}
-            title="Toggle live markdown editor"
-          >
-            {isEditing ? <Eye className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
-            <span className="hidden lg:inline">{isEditing ? TRANSLATIONS[lang].preview : TRANSLATIONS[lang].editor}</span>
-          </button>
- 
-          <div className="hidden xs:block w-[1px] h-5 app-border shrink-0" />
+          {!filename.toLowerCase().endsWith('.html') && !filename.toLowerCase().endsWith('.htm') && (
+            <>
+              <button
+                onClick={onToggleEdit}
+                className={`flex items-center gap-1.5 px-2.5 py-2 sm:px-3.5 sm:py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer select-none shrink-0 ${
+                  isEditing
+                    ? 'app-primary-btn border-transparent'
+                    : 'border app-bg-hover app-border app-text'
+                }`}
+                title="Toggle live markdown editor"
+              >
+                {isEditing ? <Eye className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
+                <span className="hidden lg:inline">{isEditing ? TRANSLATIONS[lang].preview : TRANSLATIONS[lang].editor}</span>
+              </button>
+              <div className="hidden xs:block w-[1px] h-5 app-border shrink-0" />
+            </>
+          )}
  
           {/* Theme Selector Dropdown */}
           <ThemeSwitcher currentTheme={selectedTheme} onThemeChange={onThemeChange} isNearTop={true} appTheme={appTheme} lang={lang} />
@@ -574,15 +604,6 @@ export function FloatingDock({
             <span>{copied ? TRANSLATIONS[lang].copied : TRANSLATIONS[lang].copy}</span>
           </button>
  
-          {/* Download Markdown (Desktop only) */}
-          <button
-            onClick={handleDownloadMd}
-            className="hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer border app-bg-hover app-border app-text shrink-0"
-            title="Download Raw Source File"
-          >
-            <FileText className="w-4 h-4 text-emerald-500" />
-            <span>MD</span>
-          </button>
  
           {/* PDF Export (Desktop only) */}
           <button
@@ -664,7 +685,7 @@ export function FloatingDock({
                         className="w-3.5 h-3.5 rounded border-slate-300 text-teal-600 focus:ring-teal-555"
                       />
                       <span className="text-slate-700 dark:text-slate-300 font-medium">
-                        {lang === 'en' ? 'Include MD in HTML ZIPs' : 'Inclure MD dans les ZIP HTML'}
+                        {lang === 'en' ? 'Include MD sources in ZIP (md/ folder)' : 'Inclure les MD dans le ZIP (dossier md/)'}
                       </span>
                     </label>
  
