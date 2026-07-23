@@ -622,6 +622,7 @@ export function WorkspaceApp({
               filename={activeFile.name}
               isEditing={isEditing && !activeFile.name.toLowerCase().endsWith('.html') && !activeFile.name.toLowerCase().endsWith('.htm')}
               onContentChange={handleActiveFileContentChange}
+              selectedTheme={selectedTheme}
             />
           </div>
         )}

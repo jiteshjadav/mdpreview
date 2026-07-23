@@ -4,12 +4,15 @@ import React, { useEffect } from 'react';
 import mermaid from 'mermaid';
 import { ParseResult } from '@/lib/engine/converter';
 
+import { ThemeType } from './ThemeSwitcher';
+
 export interface RenderedViewProps {
   parseResult: ParseResult;
   rawMarkdown: string;
   filename: string;
   isEditing: boolean;
   onContentChange: (content: string) => void;
+  selectedTheme?: ThemeType;
 }
 
 export function RenderedView({
@@ -18,7 +21,26 @@ export function RenderedView({
   filename,
   isEditing,
   onContentChange,
+  selectedTheme = 'split-book',
 }: RenderedViewProps) {
+
+  // Dynamically load document presentation layout theme CSS file when selectedTheme changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const themeId = selectedTheme || 'split-book';
+      let linkEl = document.getElementById('preview-doc-theme-stylesheet') as HTMLLinkElement;
+      if (!linkEl) {
+        linkEl = document.createElement('link');
+        linkEl.id = 'preview-doc-theme-stylesheet';
+        linkEl.rel = 'stylesheet';
+        document.head.appendChild(linkEl);
+      }
+      linkEl.href = `/themes/pages/${themeId}.css`;
+      document.documentElement.setAttribute('data-theme', themeId);
+      const gridCapable = ['split-book', 'dashboard-deck', 'stepped-progress'].includes(themeId);
+      document.documentElement.setAttribute('data-layout', gridCapable ? 'grid' : 'column');
+    }
+  }, [selectedTheme]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -52,7 +74,7 @@ export function RenderedView({
         // Safe catch
       }
     }
-  }, [parseResult.html, isEditing]);
+  }, [parseResult.html, isEditing, selectedTheme]);
 
   if (isEditing) {
     return (

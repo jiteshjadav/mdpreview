@@ -83,8 +83,9 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
       </div>
       <div class="header-actions">
         <div class="dropdown-layout-container" style="position: relative; display: inline-block;">
-          <button id="layoutToggleBtn" class="btn-action" title="Change Presentation Style">
-            Style
+          <button id="layoutToggleBtn" class="btn-action" title="Change Presentation Style" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg style="width: 14px; height: 14px; flex-shrink: 0; color: #475569;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            <span>Style</span>
           </button>
           <div id="layoutDropdownMenu" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 8px; width: 220px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 8px 24px -4px rgba(0,0,0,0.1), 0 4px 8px -2px rgba(0,0,0,0.06); padding: 6px; z-index: 1000;">
             <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 6px 10px; border-bottom: 1px solid #f1f5f9; color: #94a3b8; letter-spacing: 0.08em; margin-bottom: 4px; font-family: Inter, system-ui, sans-serif;">
