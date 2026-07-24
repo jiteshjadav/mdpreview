@@ -4,6 +4,30 @@
 
 @layer base {
   :root,
+  [data-app-theme="sapphire"] {
+    --app-bg-main: #f4f7fb;
+    --app-bg-card: #ffffff;
+    --app-bg-hover: #ebf3fb;
+    --app-text: #091e42;
+    --app-text-secondary: #42526e;
+    --app-text-light: #687790;
+    --app-border: #c0d6ec;
+    --app-primary: #07478b;
+    --app-primary-hover: #05366d;
+    --app-accent: #07478b;
+    --app-accent-bg: #ebf3fb;
+    --app-accent-border: #9ec2e6;
+
+    --bg-main: #f4f7fb;
+    --bg-card: #ffffff;
+    --text-primary: #091e42;
+    --text-secondary: #42526e;
+    --border-color: #c0d6ec;
+    --indigo-primary: #07478b;
+    --text-color: #091e42;
+    --bg-color: #f4f7fb;
+  }
+
   [data-app-theme="teal"] {
     --app-bg-main: #f8fafc;
     --app-bg-card: #ffffff;
@@ -24,9 +48,6 @@
     --text-secondary: #475569;
     --border-color: #e2e8f0;
     --indigo-primary: #4f46e5;
-    /* Page-theme defaults (overridden by page theme CSS link) */
-    --text-color: #1a1a1a;
-    --bg-color: #ffffff;
   }
 
   [data-app-theme="indigo"] {

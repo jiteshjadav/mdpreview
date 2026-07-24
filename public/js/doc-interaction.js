@@ -1,23 +1,32 @@
 // Client-side interactions inside exported HTML
 (function() {
-  // Setup Code Block Copy Buttons
-  document.querySelectorAll('pre').forEach(function(pre) {
-    if (pre.querySelector('.copy-btn')) return;
-    if (pre.classList.contains('mermaid')) return; // skip mermaid code source block
-    var btn = document.createElement('button');
-    btn.className = 'copy-btn';
-    btn.innerText = 'Copy';
-    btn.onclick = function() {
-      var code = pre.querySelector('code');
-      if (code) {
-        navigator.clipboard.writeText(code.innerText).then(function() {
+  // Setup Code Block Floating Copy Buttons
+  function setupCodeBlockCopyButtons() {
+    document.querySelectorAll('.markdown-body pre').forEach(function(pre) {
+      if (pre.querySelector('.copy-btn')) return;
+      if (pre.classList.contains('mermaid') || pre.closest('.doc-mermaid-viewer')) return;
+      var btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.setAttribute('type', 'button');
+      btn.setAttribute('aria-label', 'Copy code snippet');
+      btn.innerText = 'Copy';
+      btn.onclick = function(e) {
+        e.stopPropagation();
+        var code = pre.querySelector('code') || pre;
+        var textToCopy = code.innerText || code.textContent || '';
+        navigator.clipboard.writeText(textToCopy).then(function() {
           btn.innerText = 'Copied!';
-          setTimeout(function() { btn.innerText = 'Copy'; }, 2000);
+          btn.classList.add('copied');
+          setTimeout(function() {
+            btn.innerText = 'Copy';
+            btn.classList.remove('copied');
+          }, 2000);
         });
-      }
-    };
-    pre.appendChild(btn);
-  });
+      };
+      pre.appendChild(btn);
+    });
+  }
+  setupCodeBlockCopyButtons();
 
   // Auto-generate Table of Contents & Setup Collapse Toggle
   var headings = document.querySelectorAll('.markdown-body h1, .markdown-body h2, .markdown-body h3');
@@ -222,6 +231,14 @@
         if (action === 'zoom-in') zoom(0.15);
         if (action === 'zoom-out') zoom(-0.15);
         if (action === 'reset') reset();
+        if (action === 'copy') {
+          var diagramCode = diagram.textContent || diagram.innerText || '';
+          navigator.clipboard.writeText(diagramCode).then(function() {
+            var origHtml = button.innerHTML;
+            button.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            setTimeout(function() { button.innerHTML = origHtml; }, 2000);
+          });
+        }
         if (action === 'fullscreen') {
           if (document.fullscreenElement === viewer) {
             if (document.exitFullscreen) document.exitFullscreen();

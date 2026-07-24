@@ -1,0 +1,15 @@
+:root {
+  --app-bg: #f4f7fb;
+  --app-bg-card: #ffffff;
+  --app-bg-hover: #ebf3fb;
+  --app-text: #091e42;
+  --app-text-secondary: #42526e;
+  --app-text-light: #687790;
+  --app-border: #c0d6ec;
+  --app-primary: #07478b;
+  --app-primary-hover: #05366d;
+  --app-accent: #07478b;
+  --app-accent-bg: #ebf3fb;
+  --app-accent-border: #9ec2e6;
+  --app-shadow: 0 1px 3px 0 rgba(7, 71, 139, 0.1), 0 1px 2px -1px rgba(7, 71, 139, 0.1);
+}

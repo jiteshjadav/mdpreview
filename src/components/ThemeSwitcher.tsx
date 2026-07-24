@@ -63,7 +63,7 @@ export interface ThemeSwitcherProps {
   currentTheme: ThemeType;
   onThemeChange: (theme: ThemeType) => void;
   isNearTop?: boolean;
-  appTheme?: 'indigo' | 'teal' | 'dark';
+  appTheme?: 'sapphire' | 'indigo' | 'teal' | 'dark';
   lang?: 'en' | 'fr';
 }
 
@@ -143,12 +143,17 @@ export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, 
 
       <button
         onClick={handleToggle}
-        className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all border cursor-pointer app-bg-hover app-border app-text shrink-0 select-none ${
+        style={{
+          backgroundColor: 'var(--doc-header-btn-bg, #ffffff)',
+          borderColor: 'var(--doc-header-border, #c0d6ec)',
+          color: 'var(--doc-header-text, #091e42)',
+        }}
+        className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all border cursor-pointer shrink-0 select-none hover:brightness-95 ${
           showFirstTimeHint ? 'ring-2 ring-teal-500/80 ring-offset-1 ring-offset-slate-50 dark:ring-offset-slate-900 animate-pulse' : ''
         }`}
         title={`${lang === 'en' ? 'Layout style' : 'Mise en page'}: ${getLocalizedName(currentTheme)}`}
       >
-        <LayoutTemplate className="w-4 h-4 app-accent-text" />
+        <LayoutTemplate className="w-4 h-4" style={{ color: 'var(--doc-header-accent, #07478b)' }} />
         <span className="hidden xs:inline">{lang === 'en' ? 'Layout' : 'Style'}</span>
       </button>
 
@@ -209,11 +214,18 @@ export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, 
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className={`absolute left-1/2 -translate-x-1/2 w-64 p-2 rounded-xl border shadow-2xl z-50 animate-in fade-in duration-150 app-bg-card app-border app-text ${
-          isNearTop 
-            ? 'top-full mt-2 slide-in-from-top-2' 
-            : 'bottom-full mb-2 slide-in-from-bottom-2'
-        }`}>
+        <div 
+          style={{
+            backgroundColor: 'var(--doc-header-bg, #ffffff)',
+            borderColor: 'var(--doc-header-border, #c0d6ec)',
+            color: 'var(--doc-header-text, #091e42)',
+          }}
+          className={`absolute left-1/2 -translate-x-1/2 w-64 p-2 rounded-xl border shadow-2xl z-50 animate-in fade-in duration-150 ${
+            isNearTop 
+              ? 'top-full mt-2 slide-in-from-top-2' 
+              : 'bottom-full mb-2 slide-in-from-bottom-2'
+          }`}
+        >
           <div className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 mb-1 border-b app-text-light app-border">
             {lang === 'en' ? 'Select Presentation Style' : 'Style de Présentation'}
           </div>

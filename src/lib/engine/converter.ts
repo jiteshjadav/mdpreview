@@ -193,10 +193,21 @@ function transformMermaidBlocks(html: string): string {
       <div class="doc-mermaid-toolbar" aria-label="Diagram controls">
         <span>Diagram</span>
         <div class="doc-mermaid-actions">
-          <button type="button" data-mermaid-action="zoom-out" aria-label="Zoom out">-</button>
-          <button type="button" data-mermaid-action="zoom-in" aria-label="Zoom in">+</button>
-          <button type="button" data-mermaid-action="reset">Reset</button>
-          <button type="button" data-mermaid-action="fullscreen">Fullscreen</button>
+          <button type="button" data-mermaid-action="copy" data-tooltip="Copy" aria-label="Copy Diagram Code">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+          <button type="button" data-mermaid-action="zoom-out" data-tooltip="Zoom Out" aria-label="Zoom out">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          </button>
+          <button type="button" data-mermaid-action="zoom-in" data-tooltip="Zoom In" aria-label="Zoom in">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          </button>
+          <button type="button" data-mermaid-action="reset" data-tooltip="Reset" aria-label="Reset zoom">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+          </button>
+          <button type="button" data-mermaid-action="fullscreen" data-tooltip="Fullscreen" aria-label="Toggle fullscreen">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+          </button>
         </div>
       </div>
       <div class="doc-mermaid-canvas" role="group" aria-label="Interactive Mermaid diagram" tabindex="0">

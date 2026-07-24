@@ -6,7 +6,7 @@ import { Upload, Code } from 'lucide-react';
 export interface DropZoneProps {
   onFilesLoaded: (loaded: { name: string; content: string }[]) => void;
   onOpenEditor: () => void;
-  appTheme?: 'indigo' | 'teal' | 'dark';
+  appTheme?: 'sapphire' | 'indigo' | 'teal' | 'dark';
   lang?: 'en' | 'fr';
 }
 

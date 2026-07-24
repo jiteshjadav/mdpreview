@@ -73,13 +73,7 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
             </div>
           </div>
         </div>
-        ` : `
-        <!-- Single file: plain title, no dropdown -->
-        <div style="display: inline-flex; align-items: center; gap: 6px;">
-          <svg style="width: 13px; height: 13px; flex-shrink: 0; color: #94a3b8;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
-          <h1 class="doc-title">${escapeXml(title)}</h1>
-        </div>
-        `}
+        ` : ``}
       </div>
       <div class="header-actions">
         <div class="dropdown-layout-container" style="position: relative; display: inline-block;">
@@ -134,7 +128,7 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
     </aside>
 
     <main class="main-content">
-      <article class="markdown-body" id="renderedDoc">
+      <article class="markdown-body leading-relaxed space-y-4" id="renderedDoc">
         ${htmlContent}
       </article>
       <footer class="doc-footer">

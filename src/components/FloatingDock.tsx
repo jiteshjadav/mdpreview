@@ -23,7 +23,7 @@ export interface FloatingDockProps {
   onRemoveFile: (id: string) => void;
   onRenameFile: (id: string, newName: string) => void;
   onAddFiles: (loaded: { name: string; content: string }[]) => void;
-  appTheme?: 'indigo' | 'teal' | 'dark';
+  appTheme?: 'sapphire' | 'indigo' | 'teal' | 'dark';
   lang?: 'en' | 'fr';
   setLang?: (lang: 'en' | 'fr') => void;
   workspaceName?: string;
@@ -44,7 +44,7 @@ export function FloatingDock({
   onRemoveFile,
   onRenameFile,
   onAddFiles,
-  appTheme = 'teal',
+  appTheme = 'sapphire',
   lang = 'en',
   setLang,
   workspaceName = 'untitled-workspace',
@@ -59,6 +59,14 @@ export function FloatingDock({
   const [editingFileId, setEditingFileId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
   const [includeMdInZip, setIncludeMdInZip] = useState<boolean>(false);
+  const [selectedFilesForExport, setSelectedFilesForExport] = useState<string[]>([]);
+  const [exportTab, setExportTab] = useState<'single' | 'multiple'>('single');
+  const [singleExportMode, setSingleExportMode] = useState<'html' | 'md' | 'pdf'>('html');
+  const [multiExportMode, setMultiExportMode] = useState<'html' | 'wiki' | 'md'>('html');
+
+  useEffect(() => {
+    setSelectedFilesForExport(files.map(f => f.id));
+  }, [files]);
 
   const handleConfirmRename = (file: typeof files[number], newBaseName: string) => {
     const trimmed = newBaseName.trim();
@@ -96,7 +104,7 @@ export function FloatingDock({
     const standaloneHtml = generateStandaloneHtml(parseResult.html, {
       title: parseResult.title || filename.replace(/\.(md|mdx|txt)$/, ''),
       theme: selectedTheme,
-      files,
+      files: [],
       activeFileName: filename,
     });
  
@@ -137,7 +145,10 @@ export function FloatingDock({
   const handleDownloadAllMd = async () => {
     const zip = new JSZip();
     
-    files.forEach((file) => {
+    const exportFiles = files.filter(f => selectedFilesForExport.includes(f.id));
+    if (exportFiles.length === 0) return;
+    
+    exportFiles.forEach((file) => {
       const fileContent = file.content || '';
       zip.file('md/' + file.name, fileContent);
     });
@@ -163,12 +174,16 @@ export function FloatingDock({
   const handleDownloadAllHtml = async (interlink: boolean = false) => {
     const zip = new JSZip();
  
-    files.forEach((file) => {
-      if (file.html) {
-        const standaloneHtml = generateStandaloneHtml(file.html!, {
+    const exportFiles = files.filter(f => selectedFilesForExport.includes(f.id));
+    if (exportFiles.length === 0) return;
+    
+    exportFiles.forEach((file) => {
+      const htmlContent = file.html || file.content;
+      if (htmlContent) {
+        const standaloneHtml = generateStandaloneHtml(htmlContent, {
           title: file.name.replace(/\.(md|mdx|txt)$/, ''),
           theme: selectedTheme,
-          files: interlink ? files : [],
+          files: interlink ? exportFiles : [],
           activeFileName: interlink ? file.name : undefined,
         });
    
@@ -202,7 +217,7 @@ export function FloatingDock({
     const standaloneHtml = generateStandaloneHtml(parseResult.html, {
       title: parseResult.title || 'Exported Document',
       theme: selectedTheme,
-      files,
+      files: [],
       activeFileName: filename,
     });
 
@@ -277,9 +292,14 @@ export function FloatingDock({
 
       {/* Autohiding Sticky Top Header Menu */}
       <header 
-        className={`fixed top-0 left-0 right-0 z-50 h-14 border-b shadow-sm backdrop-blur-xl transition-transform duration-300 ease-in-out print:hidden flex items-center justify-between px-3 sm:px-6 app-bg-card app-border app-text ${
+        style={{
+          backgroundColor: 'var(--doc-header-bg, #ffffff)',
+          borderColor: 'var(--doc-header-border, #c0d6ec)',
+          color: 'var(--doc-header-text, #091e42)',
+        }}
+        className={`fixed top-0 left-0 right-0 z-50 h-14 border-b shadow-xs backdrop-blur-xl transition-all duration-300 ease-in-out print:hidden flex items-center justify-between px-3 sm:px-6 ${
           isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
-        } ${appTheme === 'dark' ? 'dark' : ''}`}
+        }`}
       >
         <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
           {/* Clickable Logo in Top Menu - Hidden on mobile viewports to maximize spacing */}
@@ -288,19 +308,22 @@ export function FloatingDock({
             className="hidden sm:flex items-center gap-2 cursor-pointer active:scale-95 transition-transform shrink-0 select-none"
             title="Go to upload screen"
           >
-            <img src="/logo.png" alt="MD Preview Logo" className={`h-9 w-auto object-contain transition-all rounded px-2 py-0.5 ${
-              appTheme === 'dark' ? 'bg-white/95 shadow-sm' : ''
-            }`} />
+            <img src="/logo.png" alt="MD Preview Logo" className="h-9 w-auto object-contain transition-all rounded px-2 py-0.5" />
           </div>
  
-          <div className="hidden sm:block w-[1px] h-5 app-border shrink-0" />
+          <div className="hidden sm:block w-[1px] h-5 opacity-40 shrink-0" style={{ backgroundColor: 'var(--doc-header-border, #c0d6ec)' }} />
  
           {/* Direct File Opening */}
           <label
-            className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer shrink-0 border app-bg-hover app-border app-text select-none"
+            style={{
+              backgroundColor: 'var(--doc-header-btn-bg, #ffffff)',
+              borderColor: 'var(--doc-header-border, #c0d6ec)',
+              color: 'var(--doc-header-text, #091e42)',
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer shrink-0 border select-none hover:brightness-95"
             title="Open local files in workspace"
           >
-            <FolderOpen className="w-4 h-4 app-accent-text" />
+            <FolderOpen className="w-4 h-4" style={{ color: 'var(--doc-header-accent, #07478b)' }} />
             <span>{lang === 'en' ? 'Open' : 'Ouvrir'}</span>
             <input
               type="file"
@@ -349,15 +372,20 @@ export function FloatingDock({
                   e.stopPropagation();
                   setIsFilesOpen(!isFilesOpen);
                 }}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-2xl border app-border app-bg-hover select-none shadow-xs shrink-0 max-w-[130px] xxs:max-w-[160px] xs:max-w-[190px] sm:max-w-[260px] md:max-w-[360px] hover:border-slate-350 dark:hover:border-slate-700 cursor-pointer transition-all duration-200"
+                style={{
+                  backgroundColor: 'var(--doc-header-btn-bg, #ffffff)',
+                  borderColor: 'var(--doc-header-border, #c0d6ec)',
+                  color: 'var(--doc-header-text, #091e42)',
+                }}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-2xl border select-none shadow-xs shrink-0 max-w-[130px] xxs:max-w-[160px] xs:max-w-[190px] sm:max-w-[260px] md:max-w-[360px] cursor-pointer transition-all duration-200 hover:brightness-95"
               >
-                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0">
+                <span className="text-[9px] font-bold uppercase tracking-wider opacity-75 shrink-0" style={{ color: 'var(--doc-header-text-secondary, #42526e)' }}>
                   {TRANSLATIONS[lang].viewing} ({files.length})
                 </span>
-                <span className="text-xs font-bold truncate px-0.5 app-text">
+                <span className="text-xs font-bold truncate px-0.5" style={{ color: 'var(--doc-header-text, #091e42)' }}>
                   {filename}
                 </span>
-                <span className="text-slate-400 dark:text-slate-500 text-[10px] shrink-0 font-bold">
+                <span className="text-[10px] shrink-0 font-bold opacity-75">
                   ▼
                 </span>
               </button>
@@ -558,183 +586,70 @@ export function FloatingDock({
             </div>
           </div>
         </div>
- 
+
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Live Edit Toggle */}
           {!filename.toLowerCase().endsWith('.html') && !filename.toLowerCase().endsWith('.htm') && (
             <>
               <button
                 onClick={onToggleEdit}
-                className={`flex items-center gap-1.5 px-2.5 py-2 sm:px-3.5 sm:py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer select-none shrink-0 ${
-                  isEditing
-                    ? 'app-primary-btn border-transparent'
-                    : 'border app-bg-hover app-border app-text'
-                }`}
+                style={isEditing ? {
+                  backgroundColor: 'var(--doc-header-primary-btn, #07478b)',
+                  color: '#ffffff',
+                  borderColor: 'transparent',
+                } : {
+                  backgroundColor: 'var(--doc-header-btn-bg, #ffffff)',
+                  borderColor: 'var(--doc-header-border, #c0d6ec)',
+                  color: 'var(--doc-header-text, #091e42)',
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-2 sm:px-3.5 sm:py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer select-none shrink-0 border hover:brightness-95"
                 title="Toggle live markdown editor"
               >
                 {isEditing ? <Eye className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
                 <span className="hidden lg:inline">{isEditing ? TRANSLATIONS[lang].preview : TRANSLATIONS[lang].editor}</span>
               </button>
-              <div className="hidden xs:block w-[1px] h-5 app-border shrink-0" />
+              <div className="hidden xs:block w-[1px] h-5 opacity-40 shrink-0" style={{ backgroundColor: 'var(--doc-header-border, #c0d6ec)' }} />
             </>
           )}
  
           {/* Theme Selector Dropdown */}
           <ThemeSwitcher currentTheme={selectedTheme} onThemeChange={onThemeChange} isNearTop={true} appTheme={appTheme} lang={lang} />
- 
-          {/* FAQ Button (Desktop only) */}
-          <button
-            onClick={() => setIsFaqOpen(true)}
-            className="hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold border transition-all active:scale-95 cursor-pointer app-bg-hover app-border app-text shrink-0"
-            title="Frequently Asked Questions"
-          >
-            <HelpCircle className="w-4 h-4 app-accent-text" />
-            <span>FAQ</span>
-          </button>
- 
-          <div className="hidden lg:block w-[1px] h-6 mx-0.5 app-border" />
- 
-          {/* Copy HTML (Desktop only) */}
-          <button
-            onClick={handleCopyHtml}
-            className="hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer border app-bg-hover app-border app-text shrink-0"
-            title="Copy Standalone HTML Code"
-          >
-            {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? TRANSLATIONS[lang].copied : TRANSLATIONS[lang].copy}</span>
-          </button>
- 
- 
-          {/* PDF Export (Desktop only) */}
-          <button
-            onClick={handlePrintPdf}
-            className="hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer border app-bg-hover app-border app-text shrink-0"
-            title="Print to PDF"
-          >
-            <Printer className="w-4 h-4" />
-            <span>PDF</span>
-          </button>
- 
+
           {/* Primary Download Button (Desktop only) */}
           <div className="relative hidden lg:block download-dropdown-container">
             <button
               onClick={() => {
                 setIsDownloadOpen(!isDownloadOpen);
               }}
-              className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-lg active:scale-95 cursor-pointer border-transparent app-primary-btn shrink-0"
+              style={{
+                backgroundColor: 'var(--doc-header-primary-btn, #07478b)',
+                color: '#ffffff',
+              }}
+              className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer border-transparent shrink-0 hover:brightness-110"
               title="Download Options"
             >
               <Download className="w-4 h-4" />
               <span>{TRANSLATIONS[lang].download}</span>
-              <span className="ml-0.5 text-[10px] opacity-80">▾</span>
             </button>
- 
-            {/* Click-outside backdrop overlay */}
-            {isDownloadOpen && (
-              <div 
-                className="fixed inset-0 z-40 bg-transparent"
-                onClick={() => setIsDownloadOpen(false)}
-              />
-            )}
- 
-            {isDownloadOpen && (
-              <div className="absolute right-0 w-64 p-2.5 rounded-xl border shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 top-full mt-2 app-bg-card app-border app-text">
-                <div className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 mb-1 text-slate-450 dark:text-slate-500">
-                  {lang === 'en' ? 'Active File' : 'Fichier Actif'}
-                </div>
- 
-                <button
-                  onClick={() => {
-                    setIsDownloadOpen(false);
-                    handleDownloadHtml();
-                  }}
-                  className="w-full flex items-center gap-2.5 p-2.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors hover:app-bg-hover text-left"
-                >
-                  <FileText className="w-4 h-4 text-indigo-500" />
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-slate-800 dark:text-slate-100">{lang === 'en' ? 'Download HTML' : 'Télécharger HTML'}</div>
-                    <div className="text-[9px] truncate text-slate-400 dark:text-slate-500">{filename.replace(/\.(md|mdx|html|htm)$/, '') + '.html'}</div>
-                  </div>
-                </button>
- 
-                <button
-                  onClick={() => {
-                    setIsDownloadOpen(false);
-                    handleDownloadMd();
-                  }}
-                  className="w-full flex items-center gap-2.5 p-2.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors hover:app-bg-hover text-left"
-                >
-                  <FileText className="w-4 h-4 text-emerald-500" />
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-slate-800 dark:text-slate-100">{lang === 'en' ? 'Download Markdown' : 'Télécharger Markdown'}</div>
-                    <div className="text-[9px] truncate text-slate-400 dark:text-slate-500">{filename.replace(/\.(md|mdx|html|htm)$/, '') + '.md'}</div>
-                  </div>
-                </button>
- 
-                {files.length > 1 && (
-                  <>
-                    <div className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 mt-2.5 mb-1 border-t app-border pt-2 text-slate-455 dark:text-slate-500">
-                      {lang === 'en' ? 'All Workspace Files' : "Tous les Fichiers"}
-                    </div>
- 
-                    <label className="flex items-center gap-2 p-2.5 rounded-lg text-xs font-semibold hover:app-bg-hover cursor-pointer app-text select-none">
-                      <input
-                        type="checkbox"
-                        checked={includeMdInZip}
-                        onChange={(e) => setIncludeMdInZip(e.target.checked)}
-                        className="w-3.5 h-3.5 rounded border-slate-300 text-teal-600 focus:ring-teal-555"
-                      />
-                      <span className="text-slate-700 dark:text-slate-300 font-medium">
-                        {lang === 'en' ? 'Include MD sources in ZIP (md/ folder)' : 'Inclure les MD dans le ZIP (dossier md/)'}
-                      </span>
-                    </label>
- 
-                    <button
-                      onClick={() => {
-                        setIsDownloadOpen(false);
-                        handleDownloadAllHtml(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 p-2.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors hover:app-bg-hover text-left"
-                    >
-                      <Download className="w-4 h-4 text-indigo-500" />
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold text-slate-800 dark:text-slate-100">{lang === 'en' ? 'Download All HTML (Independent)' : 'Télécharger tous HTML (Indépendant)'}</div>
-                        <div className="text-[9px] text-slate-450 dark:text-slate-500">{lang === 'en' ? `Export ${files.length} HTML pages` : `Exporter ${files.length} pages HTML`}</div>
-                      </div>
-                    </button>
- 
-                    <button
-                      onClick={() => {
-                        setIsDownloadOpen(false);
-                        handleDownloadAllHtml(true);
-                      }}
-                      className="w-full flex items-center gap-2.5 p-2.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors hover:app-bg-hover text-left mt-1"
-                    >
-                      <Download className="w-4 h-4 text-cyan-500" />
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold text-slate-800 dark:text-slate-100">{lang === 'en' ? 'Download All HTML (Interlinked)' : 'Télécharger tous HTML (Interconnecté)'}</div>
-                        <div className="text-[9px] text-slate-450 dark:text-slate-500">{lang === 'en' ? `Export as interconnected wiki` : `Lier les documents entre eux`}</div>
-                      </div>
-                    </button>
- 
-                    <button
-                      onClick={() => {
-                        setIsDownloadOpen(false);
-                        handleDownloadAllMd();
-                      }}
-                      className="w-full flex items-center gap-2.5 p-2.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors hover:app-bg-hover text-left mt-1"
-                    >
-                      <Download className="w-4 h-4 text-emerald-500" />
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold text-slate-800 dark:text-slate-100">{lang === 'en' ? 'Download All Markdown (.zip)' : 'Télécharger tous Markdown (.zip)'}</div>
-                        <div className="text-[9px] text-slate-450 dark:text-slate-500">{lang === 'en' ? `Export all source files as a ZIP` : `Exporter les fichiers source en ZIP`}</div>
-                      </div>
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
+
           </div>
+
+          <div className="hidden lg:block w-[1px] h-6 mx-0.5 opacity-40 shrink-0" style={{ backgroundColor: 'var(--doc-header-border, #c0d6ec)' }} />
+
+          {/* FAQ Button (Desktop only) */}
+          <button
+            onClick={() => setIsFaqOpen(true)}
+            style={{
+              backgroundColor: 'var(--doc-header-btn-bg, #ffffff)',
+              borderColor: 'var(--doc-header-border, #c0d6ec)',
+              color: 'var(--doc-header-text, #091e42)',
+            }}
+            className="hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold border transition-all active:scale-95 cursor-pointer shrink-0 hover:brightness-95"
+            title="Frequently Asked Questions"
+          >
+            <HelpCircle className="w-4 h-4" style={{ color: 'var(--doc-header-accent, #07478b)' }} />
+            <span>FAQ</span>
+          </button>
  
           {/* Backdrop overlay for closing 'More' popover */}
           {isMoreOpen && (
@@ -858,7 +773,7 @@ export function FloatingDock({
           onClick={() => setIsFaqOpen(false)}
         >
           <div 
-            className="w-full max-w-2xl p-6 sm:p-8 rounded-3xl border shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col gap-6 app-bg-card app-border app-text relative max-h-[90vh] overflow-y-auto"
+            className="w-full max-w-2xl p-4 sm:p-6 rounded-3xl border shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col gap-4 app-bg-card app-border app-text relative max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -922,6 +837,258 @@ export function FloatingDock({
             >
               {TRANSLATIONS[lang].done}
             </button>
+          </div>
+        </div>
+      )}
+
+
+      {/* Download Modal */}
+      {isDownloadOpen && (
+        <div 
+          className={`fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 ${appTheme === 'dark' ? 'dark' : ''}`}
+          onClick={() => setIsDownloadOpen(false)}
+        >
+          <div 
+            className="w-full max-w-2xl p-4 sm:p-6 rounded-3xl border shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col gap-4 app-bg-card app-border app-text relative max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsDownloadOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-slate-450 hover:text-slate-700 dark:hover:text-slate-200 text-xs font-semibold"
+              title="Close"
+            >
+              ✕
+            </button>
+
+            <div className="text-center space-y-2 mb-2">
+              <div className="mx-auto w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center mb-2 shadow-sm border border-indigo-200 dark:border-indigo-800/50">
+                <Download className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <h3 className="text-xl font-bold app-accent-text">
+                {lang === 'en' ? 'Export Options' : 'Options d\'Exportation'}
+              </h3>
+              <p className="text-xs app-text-secondary max-w-sm mx-auto">
+                {lang === 'en' 
+                  ? "Select a format to export the active document or your entire workspace."
+                  : "Sélectionnez un format pour exporter le document actif ou tout l'espace de travail."}
+              </p>
+            </div>
+
+            {files.length > 1 && (
+              <div className="flex bg-slate-100 dark:bg-slate-900/50 p-0.5 rounded-xl mb-2 w-56 mx-auto border app-border">
+                <button
+                  onClick={() => setExportTab('single')}
+                  className={`flex-1 py-1.5 px-3 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                    exportTab === 'single'
+                      ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                  }`}
+                >
+                  {lang === 'en' ? 'Single File' : 'Fichier Unique'}
+                </button>
+                <button
+                  onClick={() => setExportTab('multiple')}
+                  className={`flex-1 py-1.5 px-3 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                    exportTab === 'multiple'
+                      ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                  }`}
+                >
+                  {lang === 'en' ? 'Multiple Files' : 'Plusieurs Fichiers'}
+                </button>
+              </div>
+            )}
+
+            <div className="space-y-3 w-full">
+              {/* Active File Actions */}
+              {(exportTab === 'single' || files.length <= 1) && (
+                <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+
+                                {files.length > 1 && (
+                  <div className="flex flex-col gap-1.5 mb-3 px-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                      {lang === 'en' ? 'Target Document' : 'Document Cible'}
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={activeFileId || ''}
+                        onChange={(e) => onSelectFile(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-slate-900/50 border app-border rounded-xl px-3 py-2 text-xs font-semibold app-text focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none cursor-pointer"
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
+                      >
+                        {files.map(f => (
+                          <option key={f.id} value={f.id}>{f.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <button
+                    onClick={() => setSingleExportMode('html')}
+                    className={`group flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all text-center cursor-pointer ${singleExportMode === 'html' ? 'ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800 shadow-md scale-[1.02]' : 'app-border bg-slate-50/50 dark:bg-slate-900/30 hover:shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700'}`}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center transition-transform">
+                      <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <div className="font-bold text-xs text-slate-800 dark:text-slate-200">{lang === 'en' ? 'HTML Page' : 'Page HTML'}</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full max-w-[140px] px-2">{filename.replace(/\.(md|mdx|html|htm)$/, '') + '.html'}</div>
+                  </button>
+
+                  <button
+                    onClick={() => setSingleExportMode('md')}
+                    className={`group flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all text-center cursor-pointer ${singleExportMode === 'md' ? 'ring-2 ring-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800 shadow-md scale-[1.02]' : 'app-border bg-slate-50/50 dark:bg-slate-900/30 hover:shadow-sm hover:border-emerald-300 dark:hover:border-emerald-700'}`}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center transition-transform">
+                      <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div className="font-bold text-xs text-slate-800 dark:text-slate-200">{lang === 'en' ? 'Markdown' : 'Markdown'}</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full max-w-[140px] px-2">{filename.replace(/\.(md|mdx|html|htm)$/, '') + '.md'}</div>
+                  </button>
+
+                  <button
+                    onClick={() => setSingleExportMode('pdf')}
+                    className={`group flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all text-center cursor-pointer ${singleExportMode === 'pdf' ? 'ring-2 ring-purple-500 bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800 shadow-md scale-[1.02]' : 'app-border bg-slate-50/50 dark:bg-slate-900/30 hover:shadow-sm hover:border-purple-300 dark:hover:border-purple-700'}`}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center transition-transform">
+                      <Printer className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div className="font-bold text-xs text-slate-800 dark:text-slate-200">{lang === 'en' ? 'Print PDF' : 'Imprimer PDF'}</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full max-w-[140px] px-2">{lang === 'en' ? 'Save via Print dialog' : 'Exporter via Imprimer'}</div>
+                  </button>
+                </div>
+                </div>
+              )}
+
+              {/* Workspace Actions */}
+              {exportTab === 'multiple' && files.length > 1 && (
+                <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+
+                  <div className="flex flex-col gap-2 p-3 rounded-2xl border app-border bg-slate-50/50 dark:bg-slate-900/30 shadow-inner">
+                    <div className="flex items-center justify-between px-1 mb-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{lang === 'en' ? 'Select files to export' : 'Sélectionner les fichiers'}</span>
+                      <button 
+                        onClick={() => {
+                          if (selectedFilesForExport.length === files.length) {
+                            setSelectedFilesForExport([]);
+                          } else {
+                            setSelectedFilesForExport(files.map(f => f.id));
+                          }
+                        }}
+                        className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                      >
+                        {selectedFilesForExport.length === files.length ? (lang === 'en' ? 'Deselect All' : 'Tout désélectionner') : (lang === 'en' ? 'Select All' : 'Tout sélectionner')}
+                      </button>
+                    </div>
+                    <div className="max-h-24 overflow-y-auto space-y-1 pr-1" style={{ scrollbarWidth: 'thin' }}>
+                      {files.map(file => (
+                        <label key={file.id} className="flex items-center gap-2 p-1.5 rounded-xl bg-white dark:bg-slate-800 border app-border hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors cursor-pointer shadow-xs">
+                          <input 
+                            type="checkbox"
+                            checked={selectedFilesForExport.includes(file.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedFilesForExport(prev => [...prev, file.id]);
+                              } else {
+                                setSelectedFilesForExport(prev => prev.filter(id => id !== file.id));
+                              }
+                            }}
+                            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                          />
+                          <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate flex-1">{file.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="h-[1px] flex-1 bg-slate-200 dark:bg-slate-800"></div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                      {lang === 'en' ? 'Workspace Export' : 'Exportation de l\'Espace'}
+                    </div>
+                    <div className="h-[1px] flex-1 bg-slate-200 dark:bg-slate-800"></div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                    <button
+                      onClick={() => setMultiExportMode('html')}
+                      className={`flex items-start gap-3 p-3 rounded-2xl border transition-all text-left cursor-pointer ${multiExportMode === 'html' ? 'ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800 shadow-md scale-[1.01]' : 'app-border bg-slate-50/50 dark:bg-slate-900/30 hover:shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700'}`}
+                    >
+                      <div className="mt-0.5 p-2 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 shrink-0">
+                        <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-xs text-slate-800 dark:text-slate-200 leading-tight">{lang === 'en' ? (selectedFilesForExport.length === files.length ? 'All HTML Pages' : 'Selected HTML Pages') : (selectedFilesForExport.length === files.length ? 'Toutes les pages HTML' : 'Pages HTML sélectionnées')}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">{lang === 'en' ? `ZIP of ${selectedFilesForExport.length} independent files` : `ZIP de ${selectedFilesForExport.length} fichiers`}</div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => setMultiExportMode('wiki')}
+                      className={`flex items-start gap-3 p-3 rounded-2xl border transition-all text-left cursor-pointer ${multiExportMode === 'wiki' ? 'ring-2 ring-cyan-500 bg-cyan-50 dark:bg-cyan-900/30 border-cyan-200 dark:border-cyan-800 shadow-md scale-[1.01]' : 'app-border bg-slate-50/50 dark:bg-slate-900/30 hover:shadow-sm hover:border-cyan-300 dark:hover:border-cyan-700'}`}
+                    >
+                      <div className="mt-0.5 p-2 rounded-xl bg-cyan-100 dark:bg-cyan-900/40 shrink-0">
+                        <Download className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-xs text-slate-800 dark:text-slate-200 leading-tight">{lang === 'en' ? 'Interlinked Wiki' : 'Wiki Interconnecté'}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">{lang === 'en' ? `Export ${selectedFilesForExport.length} files as browsable site` : `Exporter ${selectedFilesForExport.length} fichiers en site lié`}</div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => setMultiExportMode('md')}
+                      className={`flex items-start gap-3 p-3 rounded-2xl border transition-all text-left cursor-pointer md:col-span-2 ${multiExportMode === 'md' ? 'ring-2 ring-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800 shadow-md scale-[1.01]' : 'app-border bg-slate-50/50 dark:bg-slate-900/30 hover:shadow-sm hover:border-emerald-300 dark:hover:border-emerald-700'}`}
+                    >
+                      <div className="mt-0.5 p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 shrink-0">
+                        <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-xs text-slate-800 dark:text-slate-200 leading-tight">{lang === 'en' ? (selectedFilesForExport.length === files.length ? 'All Markdown Sources' : 'Selected Markdown Sources') : (selectedFilesForExport.length === files.length ? 'Toutes les Sources MD' : 'Sources MD sélectionnées')}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">{lang === 'en' ? `Download ${selectedFilesForExport.length === files.length ? 'all' : selectedFilesForExport.length} raw .md files in a ZIP archive` : `Télécharger ${selectedFilesForExport.length === files.length ? 'tous les' : selectedFilesForExport.length} fichiers sources en ZIP`}</div>
+                      </div>
+                    </button>
+
+                    {multiExportMode !== 'md' && (
+                      <div className="md:col-span-2 pt-2">
+                        <label className="flex items-center gap-2 p-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={includeMdInZip}
+                            onChange={(e) => setIncludeMdInZip(e.target.checked)}
+                            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                          />
+                          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            {lang === 'en' ? 'Include original Markdown sources in HTML ZIP exports' : 'Inclure les sources MD originales dans les exports HTML'}
+                          </span>
+                        </label>
+                      </div>
+                    )}
+                  </div>                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col items-center w-full mt-1 border-t app-border pt-3">
+              <button 
+                onClick={() => {
+                  setIsDownloadOpen(false);
+                  if (exportTab === 'single' || files.length <= 1) {
+                    if (singleExportMode === 'html') handleDownloadHtml();
+                    if (singleExportMode === 'md') handleDownloadMd();
+                    if (singleExportMode === 'pdf') handlePrintPdf();
+                  } else {
+                    if (multiExportMode === 'html') handleDownloadAllHtml(false);
+                    if (multiExportMode === 'wiki') handleDownloadAllHtml(true);
+                    if (multiExportMode === 'md') handleDownloadAllMd();
+                  }
+                }}
+                className="w-full max-w-[200px] py-2.5 rounded-xl text-sm font-bold app-primary-btn border-transparent cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                {lang === 'en' ? 'Download' : 'Télécharger'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -67,6 +67,7 @@ export function RenderedView({
           (el) => !el.hasAttribute('data-processed') && el.querySelector('svg') === null
         );
 
+        setupCodeBlockCopyButtons();
         if (unrenderedNodes.length === 0) {
           setupMermaidViewers();
           return;
@@ -94,7 +95,7 @@ export function RenderedView({
 
   if (isEditing) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 min-h-[450px] sm:min-h-[600px] mb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 min-h-[450px] sm:min-h-[600px] mb-10 mt-14 sm:mt-16">
         {/* Editor Panel Left */}
         <div className="flex flex-col gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4.5 shadow-sm transition-colors">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-400 dark:text-slate-500 pb-2 border-b border-slate-100 dark:border-slate-800">
@@ -135,7 +136,7 @@ export function RenderedView({
         color: docTextColor,
         borderColor: docBorderColor
       }}
-      className="w-full max-w-full mx-auto border rounded-3xl mt-6 sm:mt-8 pt-6 pb-10 sm:pt-8 sm:pb-12 px-4 sm:px-6 md:px-8 shadow-sm transition-all duration-300 min-h-[450px] sm:min-h-[550px] mb-10"
+      className="w-full max-w-full mx-auto border rounded-3xl mt-16 sm:mt-20 pt-5 pb-12 px-6 sm:px-10 md:px-12 shadow-sm transition-all duration-300 min-h-[450px] sm:min-h-[550px] mb-10"
     >
       <article
         className="markdown-body leading-relaxed space-y-4"
@@ -201,6 +202,14 @@ function setupMermaidViewers() {
       if (action === 'zoom-in') zoom(0.15);
       if (action === 'zoom-out') zoom(-0.15);
       if (action === 'reset') reset();
+      if (action === 'copy') {
+        const diagramCode = diagram.textContent || diagram.innerText || '';
+        navigator.clipboard.writeText(diagramCode).then(() => {
+          const origHtml = button.innerHTML;
+          button.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          setTimeout(() => { button.innerHTML = origHtml; }, 2000);
+        });
+      }
       if (action === 'fullscreen') {
         if (document.fullscreenElement === viewer) {
           document.exitFullscreen().catch(() => { });
@@ -243,5 +252,33 @@ function setupMermaidViewers() {
     canvas.addEventListener('pointercancel', stopDragging);
 
     applyTransform();
+  });
+}
+
+function setupCodeBlockCopyButtons() {
+  document.querySelectorAll('.markdown-body pre').forEach((preEl) => {
+    const pre = preEl as HTMLElement;
+    if (pre.querySelector('.copy-btn')) return;
+    if (pre.classList.contains('mermaid') || pre.closest('.doc-mermaid-viewer')) return;
+
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('aria-label', 'Copy code snippet');
+    btn.innerText = 'Copy';
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const code = pre.querySelector('code') || pre;
+      const textToCopy = code.innerText || code.textContent || '';
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        btn.innerText = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerText = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    pre.appendChild(btn);
   });
 }

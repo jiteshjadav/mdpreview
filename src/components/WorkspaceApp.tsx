@@ -19,7 +19,7 @@ interface UploadedFile {
   parseResult: ParseResult | null;
 }
 
-export type AppTheme = 'teal' | 'indigo' | 'dark';
+export type AppTheme = 'sapphire' | 'teal' | 'indigo' | 'dark';
 
 interface AppThemeConfig {
   id: AppTheme;
@@ -29,8 +29,13 @@ interface AppThemeConfig {
 
 const APP_THEMES: AppThemeConfig[] = [
   {
+    id: 'sapphire',
+    name: 'Sapphire Blue (Default)',
+    previewColor: 'bg-blue-900',
+  },
+  {
     id: 'teal',
-    name: 'Teal Lagoon (Default)',
+    name: 'Teal Lagoon',
     previewColor: 'bg-teal-600',
   },
   {
@@ -158,7 +163,7 @@ export function WorkspaceApp({
   const [activeFileId, setActiveFileId] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<ThemeType>('sapphire-spec');
   const [isEditing, setIsEditing] = useState<boolean>(initialMode === 'editor');
-  const [appTheme, setAppTheme] = useState<AppTheme>('teal');
+  const [appTheme, setAppTheme] = useState<AppTheme>('sapphire');
   const [isPageDragging, setIsPageDragging] = useState(false);
   const [isFaqView, setIsFaqView] = useState(false);
   const [lang, setLang] = useState<'en' | 'fr'>('en');
@@ -178,7 +183,7 @@ export function WorkspaceApp({
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('mdpreview-app-theme') as AppTheme;
-    if (savedTheme && ['teal', 'indigo', 'dark'].includes(savedTheme)) {
+    if (savedTheme && ['sapphire', 'teal', 'indigo', 'dark'].includes(savedTheme)) {
       setAppTheme(savedTheme);
     }
     const savedLang = localStorage.getItem('mdpreview-lang') as 'en' | 'fr';
@@ -421,7 +426,8 @@ export function WorkspaceApp({
   return (
     <div
       data-app-theme={appTheme}
-      className={`min-h-screen flex flex-col transition-colors duration-300 ${appTheme === 'dark' ? 'dark' : ''} app-bg-main app-text`}
+      style={hasContent ? { backgroundColor: 'var(--doc-page-bg, #f4f7fb)', color: 'var(--doc-header-text, #091e42)' } : undefined}
+      className={`min-h-screen flex flex-col transition-colors duration-300 ${appTheme === 'dark' ? 'dark' : ''} ${!hasContent ? 'app-bg-main app-text' : ''}`}
       onDragOver={(e) => {
         e.preventDefault();
         setIsPageDragging(true);
