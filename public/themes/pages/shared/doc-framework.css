@@ -113,13 +113,13 @@ html {
 }
 
 :root[data-theme="stepped-progress"] {
-  --doc-page-bg: #f0fdfa;
+  --doc-page-bg: #ffffff;
   --doc-header-bg: #ffffff;
-  --doc-header-border: #ccfbf1;
-  --doc-header-text: #134e4a;
-  --doc-header-text-secondary: #0f766e;
+  --doc-header-border: #e2e8f0;
+  --doc-header-text: #0f172a;
+  --doc-header-text-secondary: #475569;
   --doc-header-btn-bg: #ffffff;
-  --doc-header-btn-hover: #ccfbf1;
+  --doc-header-btn-hover: #f1f5f9;
   --doc-header-primary-btn: #0d9488;
   --doc-header-primary-btn-hover: #0f766e;
   --doc-header-accent: #0d9488;

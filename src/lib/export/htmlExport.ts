@@ -90,6 +90,18 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
                 <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Sapphire Spec</span>
                 <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Executive corporate sapphire layout</span>
               </button>
+              <button class="layout-option-btn" data-theme-val="stepped-progress" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
+                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Stepped Guide</span>
+                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Timeline axis with numbered steps</span>
+              </button>
+              <button class="layout-option-btn" data-theme-val="clean-html" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
+                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Clean HTML</span>
+                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Simple web document style</span>
+              </button>
+              <button class="layout-option-btn" data-theme-val="dark-spec" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
+                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Dark Spec</span>
+                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Sleek dark mode layout</span>
+              </button>
               <button class="layout-option-btn" data-theme-val="split-book" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
                 <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Split Book</span>
                 <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Minimal two-column layout</span>
@@ -97,18 +109,6 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
               <button class="layout-option-btn" data-theme-val="dashboard-deck" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
                 <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Dashboard Deck</span>
                 <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Modular floating cards</span>
-              </button>
-              <button class="layout-option-btn" data-theme-val="stepped-progress" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
-                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Stepped Guide</span>
-                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Timeline axis with numbered steps</span>
-              </button>
-              <button class="layout-option-btn" data-theme-val="dark-spec" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
-                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Dark Spec</span>
-                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Sleek dark mode layout</span>
-              </button>
-              <button class="layout-option-btn" data-theme-val="clean-html" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
-                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Clean HTML</span>
-                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Simple web document style</span>
               </button>
             </div>
           </div>

@@ -28,6 +28,24 @@ export const THEME_OPTIONS: ThemeOption[] = [
     previewColor: 'bg-blue-950 border-blue-600 text-blue-200',
   },
   {
+    id: 'stepped-progress',
+    name: 'Stepped Guide',
+    description: 'Linear timeline axis with numbered step icons',
+    previewColor: 'bg-teal-50 border-teal-600/30 text-teal-900',
+  },
+  {
+    id: 'clean-html',
+    name: 'Clean HTML',
+    description: 'Simple web document style (GitHub Pages / MDX default)',
+    previewColor: 'bg-white border-slate-300 text-slate-700',
+  },
+  {
+    id: 'dark-spec',
+    name: 'Dark Spec',
+    description: 'Sleek dark mode layout with glowing accents and TOC sidebar',
+    previewColor: 'bg-slate-900 border-teal-500 text-teal-300',
+  },
+  {
     id: 'split-book',
     name: 'Split Book',
     description: 'Minimal two-column split book (Stripe/Linear style)',
@@ -38,24 +56,6 @@ export const THEME_OPTIONS: ThemeOption[] = [
     name: 'Dashboard Deck',
     description: 'Modular floating widget cards with shadows',
     previewColor: 'bg-slate-50 border-indigo-450/20 text-slate-800',
-  },
-  {
-    id: 'stepped-progress',
-    name: 'Stepped Guide',
-    description: 'Linear timeline axis with numbered step icons',
-    previewColor: 'bg-teal-50 border-teal-600/30 text-teal-900',
-  },
-  {
-    id: 'dark-spec',
-    name: 'Dark Spec',
-    description: 'Sleek dark mode layout with glowing accents and TOC sidebar',
-    previewColor: 'bg-slate-900 border-teal-500 text-teal-300',
-  },
-  {
-    id: 'clean-html',
-    name: 'Clean HTML',
-    description: 'Simple web document style (GitHub Pages / MDX default)',
-    previewColor: 'bg-white border-slate-300 text-slate-700',
   },
 ];
 
@@ -159,18 +159,31 @@ export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, 
 
       {/* Interactive First Time User Coachmark Tooltip */}
       {showFirstTimeHint && !isOpen && (
-        <div className={`absolute left-1/2 -translate-x-1/2 w-64 p-3 rounded-2xl bg-slate-900 dark:bg-slate-950 text-white shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 border border-teal-500/40 ${
-          isNearTop ? 'top-full mt-3' : 'bottom-full mb-3'
-        }`}>
+        <div 
+          style={{
+            backgroundColor: 'var(--doc-header-bg, #ffffff)',
+            borderColor: 'var(--doc-header-border, #c0d6ec)',
+            color: 'var(--doc-header-text, #091e42)',
+          }}
+          className={`absolute left-1/2 -translate-x-1/2 w-64 p-3 rounded-2xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 border ${
+            isNearTop ? 'top-full mt-3' : 'bottom-full mb-3'
+          }`}
+        >
           {/* Arrow pointing to button */}
-          <div className={`absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-900 dark:bg-slate-950 border-teal-500/40 rotate-45 ${
-            isNearTop ? '-top-1.5 border-t border-l' : '-bottom-1.5 border-b border-r'
-          }`} />
+          <div 
+            style={{
+              backgroundColor: 'var(--doc-header-bg, #ffffff)',
+              borderColor: 'var(--doc-header-border, #c0d6ec)',
+            }}
+            className={`absolute left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 ${
+              isNearTop ? '-top-1.5 border-t border-l' : '-bottom-1.5 border-b border-r'
+            }`} 
+          />
 
           <div className="relative z-10 flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold text-teal-400 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
+              <span className="text-xs font-extrabold flex items-center gap-1.5" style={{ color: 'var(--doc-header-accent, #07478b)' }}>
+                <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--doc-header-accent, #07478b)' }} />
                 {lang === 'en' ? 'Try Different Styles!' : 'Essayez d\'autres styles !'}
               </span>
               <button
@@ -178,13 +191,14 @@ export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, 
                   e.stopPropagation();
                   dismissHint();
                 }}
-                className="text-slate-400 hover:text-white transition-colors p-0.5 cursor-pointer"
+                className="opacity-60 hover:opacity-100 transition-opacity p-0.5 cursor-pointer"
+                style={{ color: 'var(--doc-header-text, #091e42)' }}
                 title="Dismiss"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
-            <p className="text-[11px] text-slate-300 leading-snug font-normal">
+            <p className="text-[11px] leading-snug font-medium opacity-85" style={{ color: 'var(--doc-header-text-secondary, #42526e)' }}>
               {lang === 'en'
                 ? 'Click here to switch presentation themes: Split Book, Dashboard Deck, Dark Spec, Sapphire Spec, and more!'
                 : 'Cliquez ici pour changer le style de mise en page : Split Book, Tableau de bord, Mode Sombre, Bleu Saphir et plus !'}
@@ -195,7 +209,11 @@ export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, 
                 dismissHint();
                 setIsOpen(true);
               }}
-              className="mt-0.5 w-full py-1.5 px-3 rounded-xl text-xs font-bold bg-teal-500 hover:bg-teal-400 text-slate-950 transition-colors shadow-md cursor-pointer flex items-center justify-center gap-1"
+              style={{
+                backgroundColor: 'var(--doc-header-accent, #07478b)',
+                color: '#ffffff',
+              }}
+              className="mt-0.5 w-full py-1.5 px-3 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center justify-center gap-1 hover:brightness-110 active:scale-95"
             >
               <span>{lang === 'en' ? 'Explore Styles' : 'Explorer les styles'}</span>
               <span>🎨</span>
