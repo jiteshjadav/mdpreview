@@ -63,7 +63,7 @@ export interface ThemeSwitcherProps {
   currentTheme: ThemeType;
   onThemeChange: (theme: ThemeType) => void;
   isNearTop?: boolean;
-  appTheme?: 'sapphire' | 'indigo' | 'teal' | 'dark';
+  appTheme?: 'sapphire' | 'dark';
   lang?: 'en' | 'fr';
 }
 

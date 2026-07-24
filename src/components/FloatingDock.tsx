@@ -8,6 +8,7 @@ import { ParseResult } from '@/lib/engine/converter';
 import { generateStandaloneHtml } from '@/lib/export/htmlExport';
 import { ThemeSwitcher, ThemeType } from './ThemeSwitcher';
 import { TRANSLATIONS } from './WorkspaceApp';
+import { Logo } from './Logo';
 
 export interface FloatingDockProps {
   parseResult: ParseResult;
@@ -23,7 +24,7 @@ export interface FloatingDockProps {
   onRemoveFile: (id: string) => void;
   onRenameFile: (id: string, newName: string) => void;
   onAddFiles: (loaded: { name: string; content: string }[]) => void;
-  appTheme?: 'sapphire' | 'indigo' | 'teal' | 'dark';
+  appTheme?: 'sapphire' | 'dark';
   lang?: 'en' | 'fr';
   setLang?: (lang: 'en' | 'fr') => void;
   workspaceName?: string;
@@ -305,10 +306,10 @@ export function FloatingDock({
           {/* Clickable Logo in Top Menu - Hidden on mobile viewports to maximize spacing */}
           <div 
             onClick={onBackToUpload}
-            className="hidden sm:flex items-center gap-2 cursor-pointer active:scale-95 transition-transform shrink-0 select-none"
+            className="hidden sm:flex items-center cursor-pointer active:scale-95 transition-transform shrink-0 select-none"
             title="Go to upload screen"
           >
-            <img src="/logo.png" alt="MD Preview Logo" className="h-9 w-auto object-contain transition-all rounded px-2 py-0.5" />
+            <Logo className="h-8 sm:h-9 w-auto" />
           </div>
  
           <div className="hidden sm:block w-[1px] h-5 opacity-40 shrink-0" style={{ backgroundColor: 'var(--doc-header-border, #c0d6ec)' }} />

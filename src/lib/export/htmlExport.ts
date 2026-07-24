@@ -1,3 +1,5 @@
+import { BRAND_ICON_BASE64 } from './logoBase64';
+
 export interface ExportOptions {
   title?: string;
   theme?: 'split-book' | 'dashboard-deck' | 'stepped-progress' | 'dark-spec' | 'warm-editorial' | 'sapphire-spec' | 'enterprise-blue' | 'clean-html';
@@ -132,7 +134,13 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
         ${htmlContent}
       </article>
       <footer class="doc-footer">
-        Generated with <a href="https://github.com/northbithq/mdpreview" target="_blank" rel="noopener">MD Preview</a> • Developed by <a href="https://northbit.ca/" target="_blank" rel="noopener">Northbit</a>
+        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; opacity: 0.85;">
+          <span>Generated with</span>
+          <a href="https://mdpreview.io" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 5px; text-decoration: none; color: inherit; font-weight: 800;">
+            <img src="${BRAND_ICON_BASE64}" alt="mdpreview icon" style="height: 15px; width: auto; vertical-align: middle; flex-shrink: 0; object-fit: contain;" />
+            <span>mdpreview<span style="color: #0284c7; font-weight: 700;">.io</span></span>
+          </a>
+        </span>
       </footer>
     </main>
   </div>

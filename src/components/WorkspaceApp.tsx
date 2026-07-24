@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FileText, ShieldCheck, Upload, SunMoon, Globe, HelpCircle, AlertTriangle, Download } from 'lucide-react';
+import { FileText, ShieldCheck, Upload, Sun, Moon, Globe, HelpCircle, AlertTriangle, Download, Files, Sparkles, X, Layers } from 'lucide-react';
 import { DropZone } from '@/components/DropZone';
 import { RenderedView } from '@/components/RenderedView';
 import { FloatingDock } from '@/components/FloatingDock';
 import { AdSlot } from '@/components/AdSlot';
 import { convertMarkdown, ParseResult } from '@/lib/engine/converter';
 import { ThemeType } from '@/components/ThemeSwitcher';
+import { Logo } from '@/components/Logo';
+import { GreenShieldIcon } from '@/components/GreenShieldIcon';
 import { generateStandaloneHtml } from '@/lib/export/htmlExport';
 import JSZip from 'jszip';
 import packageJson from '../../package.json';
@@ -19,36 +21,9 @@ interface UploadedFile {
   parseResult: ParseResult | null;
 }
 
-export type AppTheme = 'sapphire' | 'teal' | 'indigo' | 'dark';
+export type AppTheme = 'sapphire' | 'dark';
 
-interface AppThemeConfig {
-  id: AppTheme;
-  name: string;
-  previewColor: string;
-}
 
-const APP_THEMES: AppThemeConfig[] = [
-  {
-    id: 'sapphire',
-    name: 'Sapphire Blue (Default)',
-    previewColor: 'bg-blue-900',
-  },
-  {
-    id: 'teal',
-    name: 'Teal Lagoon',
-    previewColor: 'bg-teal-600',
-  },
-  {
-    id: 'indigo',
-    name: 'Indigo Breeze',
-    previewColor: 'bg-indigo-600',
-  },
-  {
-    id: 'dark',
-    name: 'Dark Mode',
-    previewColor: 'bg-slate-800 dark:bg-slate-100 border-slate-650 dark:border-slate-355',
-  },
-];
 
 export const TRANSLATIONS = {
   en: {
@@ -167,9 +142,20 @@ export function WorkspaceApp({
   const [isPageDragging, setIsPageDragging] = useState(false);
   const [isFaqView, setIsFaqView] = useState(false);
   const [lang, setLang] = useState<'en' | 'fr'>('en');
-  const [isAppThemeOpen, setIsAppThemeOpen] = useState(false);
+
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showIntroModal, setShowIntroModal] = useState(false);
   const [workspaceName, setWorkspaceName] = useState<string>('untitled-workspace');
+
+  const handleCloseIntroModal = () => {
+    setShowIntroModal(false);
+    try {
+      localStorage.setItem('mdpreview_seen_intro_modal', 'true');
+      document.cookie = 'mdpreview_seen_intro_modal=true; path=/; max-age=31536000; SameSite=Lax';
+    } catch (e) {
+      console.error('Failed to save intro modal preference:', e);
+    }
+  };
 
   const handleDocThemeChange = (newTheme: ThemeType) => {
     setSelectedTheme(newTheme);
@@ -183,7 +169,7 @@ export function WorkspaceApp({
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('mdpreview-app-theme') as AppTheme;
-    if (savedTheme && ['sapphire', 'teal', 'indigo', 'dark'].includes(savedTheme)) {
+    if (savedTheme && ['sapphire', 'dark'].includes(savedTheme)) {
       setAppTheme(savedTheme);
     }
     const savedLang = localStorage.getItem('mdpreview-lang') as 'en' | 'fr';
@@ -199,6 +185,13 @@ export function WorkspaceApp({
       if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
       return null;
     };
+
+    // First-time visit check for multi-file guiding popup
+    const cookieSeen = getCookie('mdpreview_seen_intro_modal');
+    const localSeen = typeof window !== 'undefined' ? localStorage.getItem('mdpreview_seen_intro_modal') : null;
+    if (!cookieSeen && !localSeen) {
+      const timer = setTimeout(() => setShowIntroModal(true), 400);
+    }
 
     const cookieTheme = getCookie('mdpreview_doc_theme') as ThemeType;
     const localTheme = (typeof window !== 'undefined' ? localStorage.getItem('mdpreview_doc_theme') : null) as ThemeType;
@@ -473,55 +466,24 @@ export function WorkspaceApp({
       {/* Dynamic Top App Header */}
       {!hasContent && (
         <header className="w-full border-b app-border app-bg-card transition-colors duration-300">
-          <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsFaqView(false)}>
-              <img
-                src="/logo.png"
-                alt="MD Preview Logo"
-                className={`h-9 sm:h-10 w-auto object-contain transition-transform hover:scale-105 rounded px-1 ${appTheme === 'dark' ? 'bg-white/95 p-1 shadow-sm' : ''
-                  }`}
-              />
-              <div className="hidden sm:block">
-                <p className="text-xs app-text-secondary font-medium">
-                  Instant Client-Side Markdown Viewer & HTML Exporter
-                </p>
-              </div>
+              <Logo className="h-6 w-auto" />
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <button
-                  onClick={() => setIsAppThemeOpen(!isAppThemeOpen)}
-                  className="flex items-center justify-center p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer app-bg-hover app-border app-text select-none"
-                  title="Change Application Theme"
-                >
-                  <SunMoon className="w-4 h-4 app-accent-text" />
-                </button>
-
-                {isAppThemeOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 p-2 rounded-2xl border shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 app-bg-card app-border app-text">
-                    <div className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 mb-1 app-text-light border-b app-border">
-                      {TRANSLATIONS[lang].appTheme}
-                    </div>
-                    {APP_THEMES.map((theme) => (
-                      <button
-                        key={theme.id}
-                        onClick={() => {
-                          handleAppThemeChange(theme.id);
-                          setIsAppThemeOpen(false);
-                        }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${appTheme === theme.id
-                            ? 'app-accent-bg app-accent-text font-bold'
-                            : 'hover:app-bg-hover app-text-secondary'
-                          }`}
-                      >
-                        <span className={`w-3.5 h-3.5 rounded-full border shadow-xs ${theme.previewColor}`} />
-                        <span>{theme.name}</span>
-                      </button>
-                    ))}
-                  </div>
+              <button
+                onClick={() => handleAppThemeChange(appTheme === 'dark' ? 'sapphire' : 'dark')}
+                className="flex items-center justify-center p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer app-bg-hover app-border app-text select-none"
+                title={appTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                aria-label="Toggle dark/light mode"
+              >
+                {appTheme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-amber-400" />
+                ) : (
+                  <Moon className="w-4 h-4 app-accent-text" />
                 )}
-              </div>
+              </button>
 
               <button
                 onClick={() => {
@@ -569,11 +531,9 @@ export function WorkspaceApp({
                   </>
                 )}
               </p>
-              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-bold app-accent-bg app-accent-text border app-accent-border shadow-xs select-none">
-                <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" />
-                </div>
-                <span>{TRANSLATIONS[lang].securityBadge}</span>
+              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold app-bg-card border app-border shadow-md select-none">
+                <GreenShieldIcon size={24} />
+                <span className="app-text font-bold">{TRANSLATIONS[lang].securityBadge}</span>
               </div>
             </div>
 
@@ -603,7 +563,7 @@ export function WorkspaceApp({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-5 rounded-3xl border app-bg-card app-border space-y-2">
                 <h3 className="text-sm font-bold app-text flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 app-accent-text" />
+                  <GreenShieldIcon size={20} />
                   {TRANSLATIONS[lang].faqSec}
                 </h3>
                 <p className="text-xs app-text-secondary leading-relaxed">
@@ -694,7 +654,7 @@ export function WorkspaceApp({
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <span>{TRANSLATIONS[lang].developedBy} <a href="https://northbit.ca" target="_blank" rel="noopener noreferrer" className="font-bold app-accent-text hover:underline">Northbit</a></span>
+              <Logo className="h-5 w-auto" />
             </div>
           </div>
         </footer>
@@ -751,6 +711,8 @@ export function WorkspaceApp({
           </div>
         </div>
       )}
+
+
     </div>
   );
 }
