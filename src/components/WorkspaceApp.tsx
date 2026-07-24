@@ -156,7 +156,7 @@ export function WorkspaceApp({
 }: WorkspaceAppProps) {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [activeFileId, setActiveFileId] = useState<string | null>(null);
-  const [selectedTheme, setSelectedTheme] = useState<ThemeType>('split-book');
+  const [selectedTheme, setSelectedTheme] = useState<ThemeType>('sapphire-spec');
   const [isEditing, setIsEditing] = useState<boolean>(initialMode === 'editor');
   const [appTheme, setAppTheme] = useState<AppTheme>('teal');
   const [isPageDragging, setIsPageDragging] = useState(false);
@@ -469,12 +469,11 @@ export function WorkspaceApp({
         <header className="w-full border-b app-border app-bg-card transition-colors duration-300">
           <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsFaqView(false)}>
-              <img 
-                src="/logo.png" 
-                alt="MD Preview Logo" 
-                className={`h-9 sm:h-10 w-auto object-contain transition-transform hover:scale-105 rounded px-1 ${
-                  appTheme === 'dark' ? 'bg-white/95 p-1 shadow-sm' : ''
-                }`} 
+              <img
+                src="/logo.png"
+                alt="MD Preview Logo"
+                className={`h-9 sm:h-10 w-auto object-contain transition-transform hover:scale-105 rounded px-1 ${appTheme === 'dark' ? 'bg-white/95 p-1 shadow-sm' : ''
+                  }`}
               />
               <div className="hidden sm:block">
                 <p className="text-xs app-text-secondary font-medium">
@@ -505,11 +504,10 @@ export function WorkspaceApp({
                           handleAppThemeChange(theme.id);
                           setIsAppThemeOpen(false);
                         }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                          appTheme === theme.id
+                        className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${appTheme === theme.id
                             ? 'app-accent-bg app-accent-text font-bold'
                             : 'hover:app-bg-hover app-text-secondary'
-                        }`}
+                          }`}
                       >
                         <span className={`w-3.5 h-3.5 rounded-full border shadow-xs ${theme.previewColor}`} />
                         <span>{theme.name}</span>
@@ -533,11 +531,10 @@ export function WorkspaceApp({
 
               <button
                 onClick={() => setIsFaqView(!isFaqView)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer select-none ${
-                  isFaqView
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer select-none ${isFaqView
                     ? 'app-primary-btn border-transparent shadow-xs'
                     : 'app-bg-hover app-border app-text'
-                }`}
+                  }`}
               >
                 <HelpCircle className="w-3.5 h-3.5" />
                 <span>{TRANSLATIONS[lang].faq}</span>
@@ -548,7 +545,7 @@ export function WorkspaceApp({
       )}
 
       {/* Main Workspace Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8 flex flex-col justify-center">
+      <main className={`flex-1 w-full mx-auto px-4 sm:px-6 md:px-8 py-8 flex flex-col justify-center ${hasContent ? 'max-w-[96%]' : 'max-w-6xl'}`}>
         {!hasContent && !isFaqView && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="text-center space-y-3 max-w-2xl mx-auto">
@@ -643,7 +640,7 @@ export function WorkspaceApp({
 
         {/* Full-Page Workspace Screen (State B) */}
         {hasContent && activeFile && (
-          <div className="animate-in fade-in duration-300 preview-isolate" style={{ colorScheme: 'light' }}>
+          <div className="animate-in fade-in duration-300 preview-isolate" style={{ colorScheme: (selectedTheme === 'dark-spec' || selectedTheme === 'warm-editorial') ? 'dark' : 'light' }}>
             <RenderedView
               parseResult={activeFile.parseResult!}
               rawMarkdown={activeFile.content}
@@ -700,7 +697,7 @@ export function WorkspaceApp({
       {/* Exit Confirmation Dialog */}
       {showExitConfirm && (
         <div className={`fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 ${appTheme === 'dark' ? 'dark' : ''}`}>
-          <div 
+          <div
             className="w-full max-w-md p-6 rounded-3xl border shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col gap-5 app-bg-card app-border app-text relative"
             onClick={(e) => e.stopPropagation()}
           >
@@ -719,8 +716,8 @@ export function WorkspaceApp({
             </div>
 
             <p className="text-xs app-text-secondary leading-relaxed border-y py-3.5 app-border">
-              {lang === 'en' 
-                ? 'All files and unsaved changes in the workspace will be permanently lost. We recommend exporting your documents first.' 
+              {lang === 'en'
+                ? 'All files and unsaved changes in the workspace will be permanently lost. We recommend exporting your documents first.'
                 : 'Tous les fichiers et modifications de l’espace seront définitivement perdus. Nous vous conseillons d’exporter vos documents au préalable.'}
             </p>
 

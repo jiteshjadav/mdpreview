@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
-import { LayoutTemplate } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { LayoutTemplate, Sparkles, X } from 'lucide-react';
 
 export type ThemeType = 
   | 'split-book' 
   | 'dashboard-deck' 
   | 'stepped-progress'
+  | 'dark-spec'
   | 'warm-editorial'
   | 'sapphire-spec'
   | 'enterprise-blue'
@@ -20,6 +21,12 @@ export interface ThemeOption {
 }
 
 export const THEME_OPTIONS: ThemeOption[] = [
+  {
+    id: 'sapphire-spec',
+    name: 'Sapphire Spec',
+    description: 'Executive corporate sapphire layout for technical documentation',
+    previewColor: 'bg-blue-950 border-blue-600 text-blue-200',
+  },
   {
     id: 'split-book',
     name: 'Split Book',
@@ -39,16 +46,10 @@ export const THEME_OPTIONS: ThemeOption[] = [
     previewColor: 'bg-teal-50 border-teal-600/30 text-teal-900',
   },
   {
-    id: 'warm-editorial',
-    name: 'Warm Editorial',
-    description: 'Human-friendly serif magazine style with warm amber tones',
-    previewColor: 'bg-amber-50 border-orange-200 text-orange-900',
-  },
-  {
-    id: 'sapphire-spec',
-    name: 'Sapphire Spec',
-    description: 'Executive corporate sapphire layout for technical documentation',
-    previewColor: 'bg-blue-950 border-blue-600 text-blue-200',
+    id: 'dark-spec',
+    name: 'Dark Spec',
+    description: 'Sleek dark mode layout with glowing accents and TOC sidebar',
+    previewColor: 'bg-slate-900 border-teal-500 text-teal-300',
   },
   {
     id: 'clean-html',
@@ -68,8 +69,46 @@ export interface ThemeSwitcherProps {
 
 export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, lang = 'en' }: ThemeSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showFirstTimeHint, setShowFirstTimeHint] = useState(false);
+
+  useEffect(() => {
+    const getCookie = (name: string): string | null => {
+      if (typeof document === 'undefined') return null;
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+      return null;
+    };
+
+    const hasSeenCookie = getCookie('mdpreview_seen_style_hint');
+    const hasSeenLocal = typeof window !== 'undefined' ? localStorage.getItem('mdpreview_seen_style_hint') : 'true';
+
+    if (!hasSeenCookie && !hasSeenLocal) {
+      setShowFirstTimeHint(true);
+    }
+  }, []);
+
+  const dismissHint = () => {
+    setShowFirstTimeHint(false);
+    try {
+      document.cookie = 'mdpreview_seen_style_hint=true; path=/; max-age=31536000; SameSite=Lax';
+      localStorage.setItem('mdpreview_seen_style_hint', 'true');
+    } catch (e) {
+      console.error('Failed to set style hint cookie:', e);
+    }
+  };
+
+  const handleToggle = () => {
+    if (showFirstTimeHint) {
+      dismissHint();
+    }
+    setIsOpen(!isOpen);
+  };
 
   const handleSelect = (theme: ThemeType) => {
+    if (showFirstTimeHint) {
+      dismissHint();
+    }
     onThemeChange(theme);
     setIsOpen(false);
   };
@@ -78,7 +117,7 @@ export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, 
     if (id === 'split-book') return 'Split Book';
     if (id === 'dashboard-deck') return lang === 'en' ? 'Dashboard Deck' : 'Tableau de Bord';
     if (id === 'stepped-progress') return lang === 'en' ? 'Stepped Guide' : 'Guide par Étapes';
-    if (id === 'warm-editorial') return lang === 'en' ? 'Warm Editorial' : 'Éditorial Chaleureux';
+    if (id === 'dark-spec' || id === 'warm-editorial') return lang === 'en' ? 'Dark Spec' : 'Spécification Sombre';
     if (id === 'sapphire-spec' || id === 'enterprise-blue') return lang === 'en' ? 'Sapphire Spec' : 'Spécification Saphir';
     return lang === 'en' ? 'Clean HTML' : 'HTML Simple';
   };
@@ -87,21 +126,78 @@ export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, 
     if (id === 'split-book') return lang === 'en' ? 'Minimal two-column split book (Stripe/Linear style)' : 'Livre séparé en deux colonnes (Style Stripe)';
     if (id === 'dashboard-deck') return lang === 'en' ? 'Modular floating widget cards with shadows' : 'Cartes widgets flottantes modulaires avec ombres';
     if (id === 'stepped-progress') return lang === 'en' ? 'Linear timeline axis with numbered step icons' : 'Axe chronologique linéaire avec étapes numérotées';
-    if (id === 'warm-editorial') return lang === 'en' ? 'Human-friendly serif magazine style with warm tones' : 'Style magazine serif chaleureux et humain';
+    if (id === 'dark-spec' || id === 'warm-editorial') return lang === 'en' ? 'Sleek dark mode layout with glowing accents and TOC sidebar' : 'Style de référence sombre élégant avec menu latéral';
     if (id === 'sapphire-spec' || id === 'enterprise-blue') return lang === 'en' ? 'Executive corporate sapphire layout for technical documentation' : 'Style de référence technique bleu saphir entreprise';
     return lang === 'en' ? 'Simple web document style (GitHub Pages / MDX)' : 'Style document web simple (GitHub Pages / MDX)';
   };
 
   return (
     <div className="relative">
+      {/* Pulse Beacon Effect for First Time User */}
+      {showFirstTimeHint && (
+        <span className="absolute -top-1 -right-1 flex h-3 w-3 z-30 pointer-events-none">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-teal-500"></span>
+        </span>
+      )}
+
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all border cursor-pointer app-bg-hover app-border app-text shrink-0 select-none"
+        onClick={handleToggle}
+        className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all border cursor-pointer app-bg-hover app-border app-text shrink-0 select-none ${
+          showFirstTimeHint ? 'ring-2 ring-teal-500/80 ring-offset-1 ring-offset-slate-50 dark:ring-offset-slate-900 animate-pulse' : ''
+        }`}
         title={`${lang === 'en' ? 'Layout style' : 'Mise en page'}: ${getLocalizedName(currentTheme)}`}
       >
         <LayoutTemplate className="w-4 h-4 app-accent-text" />
         <span className="hidden xs:inline">{lang === 'en' ? 'Layout' : 'Style'}</span>
       </button>
+
+      {/* Interactive First Time User Coachmark Tooltip */}
+      {showFirstTimeHint && !isOpen && (
+        <div className={`absolute left-1/2 -translate-x-1/2 w-64 p-3 rounded-2xl bg-slate-900 dark:bg-slate-950 text-white shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 border border-teal-500/40 ${
+          isNearTop ? 'top-full mt-3' : 'bottom-full mb-3'
+        }`}>
+          {/* Arrow pointing to button */}
+          <div className={`absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-900 dark:bg-slate-950 border-teal-500/40 rotate-45 ${
+            isNearTop ? '-top-1.5 border-t border-l' : '-bottom-1.5 border-b border-r'
+          }`} />
+
+          <div className="relative z-10 flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-extrabold text-teal-400 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                {lang === 'en' ? 'Try Different Styles!' : 'Essayez d\'autres styles !'}
+              </span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dismissHint();
+                }}
+                className="text-slate-400 hover:text-white transition-colors p-0.5 cursor-pointer"
+                title="Dismiss"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-snug font-normal">
+              {lang === 'en'
+                ? 'Click here to switch presentation themes: Split Book, Dashboard Deck, Dark Spec, Sapphire Spec, and more!'
+                : 'Cliquez ici pour changer le style de mise en page : Split Book, Tableau de bord, Mode Sombre, Bleu Saphir et plus !'}
+            </p>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                dismissHint();
+                setIsOpen(true);
+              }}
+              className="mt-0.5 w-full py-1.5 px-3 rounded-xl text-xs font-bold bg-teal-500 hover:bg-teal-400 text-slate-950 transition-colors shadow-md cursor-pointer flex items-center justify-center gap-1"
+            >
+              <span>{lang === 'en' ? 'Explore Styles' : 'Explorer les styles'}</span>
+              <span>🎨</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Backdrop overlay to close when clicking outside */}
       {isOpen && (

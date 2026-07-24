@@ -66,7 +66,7 @@
   // Grid-capable themes: these use a 2-column doc-wrapper with a collapsible TOC sidebar.
   // All other themes get data-layout="column" (no sidebar).
   // To register a new grid-capable theme, add its ID here.
-  var GRID_THEMES = ['split-book', 'dashboard-deck', 'stepped-progress', 'sapphire-spec', 'enterprise-blue', 'api-docs'];
+  var GRID_THEMES = ['split-book', 'dashboard-deck', 'stepped-progress', 'dark-spec', 'warm-editorial', 'sapphire-spec', 'enterprise-blue', 'api-docs'];
 
   function getLayout(themeId) {
     return GRID_THEMES.indexOf(themeId) !== -1 ? 'grid' : 'column';

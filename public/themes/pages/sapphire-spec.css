@@ -37,12 +37,13 @@ body.theme-body {
 }
 
 .doc-wrapper {
-  max-width: var(--doc-max-width-grid);
-  width: var(--doc-wrapper-width);
-  margin: 1.5rem auto;
+  max-width: var(--doc-max-width-grid, 100%);
+  width: var(--doc-wrapper-width, 100%);
+  margin: var(--doc-wrapper-margin, 1rem auto);
+  padding: 0 var(--doc-side-gap, 1.25rem);
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 2rem;
+  grid-template-columns: var(--doc-sidebar-width, 250px) 1fr;
+  gap: var(--doc-grid-gap, 1.75rem);
 }
 
 @media (max-width: 992px) {

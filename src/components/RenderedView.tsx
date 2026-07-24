@@ -48,7 +48,7 @@ export function RenderedView({
       }
       linkEl.href = `/themes/pages/${themeId}.css`;
       document.documentElement.setAttribute('data-theme', themeId);
-      const gridCapable = ['split-book', 'dashboard-deck', 'stepped-progress', 'sapphire-spec', 'enterprise-blue'].includes(themeId);
+      const gridCapable = ['split-book', 'dashboard-deck', 'stepped-progress', 'dark-spec', 'warm-editorial', 'sapphire-spec', 'enterprise-blue'].includes(themeId);
       document.documentElement.setAttribute('data-layout', gridCapable ? 'grid' : 'column');
     }
   }, [selectedTheme]);
@@ -61,7 +61,7 @@ export function RenderedView({
           theme: 'default',
           securityLevel: 'loose',
         });
-        
+
         // Find elements that have not been compiled into SVG elements yet
         const unrenderedNodes = Array.from(document.querySelectorAll('.doc-mermaid.mermaid')).filter(
           (el) => !el.hasAttribute('data-processed') && el.querySelector('svg') === null
@@ -87,6 +87,11 @@ export function RenderedView({
     }
   }, [parseResult.html, isEditing, selectedTheme]);
 
+  const isDarkDocTheme = selectedTheme === 'dark-spec' || selectedTheme === 'warm-editorial';
+  const docBgColor = isDarkDocTheme ? '#0b0f19' : 'var(--bg-color, #ffffff)';
+  const docTextColor = isDarkDocTheme ? '#cbd5e1' : 'var(--text-color, #1a1a1a)';
+  const docBorderColor = isDarkDocTheme ? '#1e293b' : 'var(--border-color, #e5e5e5)';
+
   if (isEditing) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 min-h-[450px] sm:min-h-[600px] mb-10">
@@ -103,13 +108,13 @@ export function RenderedView({
             className="flex-1 min-h-[320px] sm:min-h-[500px] w-full p-3 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-900 font-mono text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none leading-relaxed transition-all shadow-inner"
           />
         </div>
- 
+
         {/* Live Preview Panel Right */}
-        <div 
-          style={{ 
-            backgroundColor: 'var(--bg-color, #ffffff)', 
-            color: 'var(--text-color, #1a1a1a)',
-            borderColor: 'var(--border-color, #e5e5e5)' 
+        <div
+          style={{
+            backgroundColor: docBgColor,
+            color: docTextColor,
+            borderColor: docBorderColor
           }}
           className="border rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm transition-colors overflow-auto max-h-[500px] sm:max-h-[650px]"
         >
@@ -121,16 +126,16 @@ export function RenderedView({
       </div>
     );
   }
- 
+
   // Full screen preview mode
   return (
-    <div 
-      style={{ 
-        backgroundColor: 'var(--bg-color, #ffffff)', 
-        color: 'var(--text-color, #1a1a1a)',
-        borderColor: 'var(--border-color, #e5e5e5)' 
+    <div
+      style={{
+        backgroundColor: docBgColor,
+        color: docTextColor,
+        borderColor: docBorderColor
       }}
-      className="w-full max-w-[1680px] mx-auto border rounded-3xl mt-6 sm:mt-8 pt-6 pb-10 px-4 sm:pt-8 sm:pb-12 sm:px-10 shadow-sm transition-all duration-300 min-h-[450px] sm:min-h-[550px] mb-10"
+      className="w-full max-w-full mx-auto border rounded-3xl mt-6 sm:mt-8 pt-6 pb-10 sm:pt-8 sm:pb-12 px-4 sm:px-6 md:px-8 shadow-sm transition-all duration-300 min-h-[450px] sm:min-h-[550px] mb-10"
     >
       <article
         className="markdown-body leading-relaxed space-y-4"
@@ -198,9 +203,9 @@ function setupMermaidViewers() {
       if (action === 'reset') reset();
       if (action === 'fullscreen') {
         if (document.fullscreenElement === viewer) {
-          document.exitFullscreen().catch(() => {});
+          document.exitFullscreen().catch(() => { });
         } else {
-          viewer.requestFullscreen().catch(() => {});
+          viewer.requestFullscreen().catch(() => { });
         }
       }
     });
@@ -230,7 +235,7 @@ function setupMermaidViewers() {
     const stopDragging = (event: PointerEvent) => {
       if (isDragging) {
         isDragging = false;
-        try { canvas.releasePointerCapture(event.pointerId); } catch (_) {}
+        try { canvas.releasePointerCapture(event.pointerId); } catch (_) { }
       }
     };
 

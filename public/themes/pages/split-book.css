@@ -95,8 +95,8 @@ body.theme-body {
 /* Right panel document content */
 .main-content {
   background: var(--panel-right);
-  padding: 3rem 4.5rem;
-  max-width: 860px;
+  padding: 2rem 2.5rem;
+  max-width: 100%;
 }
 
 .markdown-body h1, .markdown-body h2, .markdown-body h3 {
@@ -122,10 +122,20 @@ body.theme-body {
 .markdown-body pre {
   position: relative;
   background: #111111;
-  border-radius: 8px;
+  border-radius: 12px !important;
   padding: 1.25rem;
   overflow-x: auto;
   margin: 1.5rem 0;
+  box-shadow: 0 18px 45px -4px rgba(0, 0, 0, 0.32), 0 6px 20px -2px rgba(79, 70, 229, 0.2) !important;
+}
+
+.table-container,
+.card,
+.markdown-body blockquote,
+.markdown-body img,
+.doc-mermaid-container {
+  box-shadow: 0 14px 36px -4px rgba(0, 0, 0, 0.1), 0 6px 18px -2px rgba(79, 70, 229, 0.12) !important;
+  border-radius: 12px !important;
 }
 .markdown-body pre code { background: transparent; padding: 0; color: #eeeeee; }
 .copy-btn {

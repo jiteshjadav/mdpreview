@@ -1,6 +1,6 @@
 export interface ExportOptions {
   title?: string;
-  theme?: 'split-book' | 'dashboard-deck' | 'stepped-progress' | 'warm-editorial' | 'sapphire-spec' | 'enterprise-blue' | 'clean-html';
+  theme?: 'split-book' | 'dashboard-deck' | 'stepped-progress' | 'dark-spec' | 'warm-editorial' | 'sapphire-spec' | 'enterprise-blue' | 'clean-html';
   includeToc?: boolean;
   files?: { id: string; name: string }[];
   activeFileName?: string;
@@ -9,11 +9,11 @@ export interface ExportOptions {
 // Grid-capable themes have a two-column doc-wrapper with a collapsible TOC sidebar.
 // All other themes use a single-column layout (no sidebar).
 // When adding a new grid-capable theme, add its ID here AND to GRID_THEMES in doc-interaction.js.
-const GRID_THEMES = new Set(['split-book', 'dashboard-deck', 'stepped-progress', 'sapphire-spec', 'enterprise-blue']);
+const GRID_THEMES = new Set(['split-book', 'dashboard-deck', 'stepped-progress', 'dark-spec', 'warm-editorial', 'sapphire-spec', 'enterprise-blue']);
 
 export function generateStandaloneHtml(htmlContent: string, options: ExportOptions = {}): string {
   const title = options.title || 'Exported Documentation';
-  const theme = options.theme || 'split-book';
+  const theme = options.theme || 'sapphire-spec';
   const files = options.files || [];
   const activeFileName = options.activeFileName || '';
   const layout = GRID_THEMES.has(theme) ? 'grid' : 'column';
@@ -92,6 +92,10 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
               Presentation Style
             </div>
             <div style="display: flex; flex-direction: column; gap: 1px;">
+              <button class="layout-option-btn" data-theme-val="sapphire-spec" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
+                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Sapphire Spec</span>
+                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Executive corporate sapphire layout</span>
+              </button>
               <button class="layout-option-btn" data-theme-val="split-book" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
                 <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Split Book</span>
                 <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Minimal two-column layout</span>
@@ -104,13 +108,9 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
                 <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Stepped Guide</span>
                 <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Timeline axis with numbered steps</span>
               </button>
-              <button class="layout-option-btn" data-theme-val="warm-editorial" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
-                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Warm Editorial</span>
-                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Serif magazine style</span>
-              </button>
-              <button class="layout-option-btn" data-theme-val="sapphire-spec" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
-                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Sapphire Spec</span>
-                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Executive corporate sapphire layout</span>
+              <button class="layout-option-btn" data-theme-val="dark-spec" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
+                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Dark Spec</span>
+                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Sleek dark mode layout</span>
               </button>
               <button class="layout-option-btn" data-theme-val="clean-html" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
                 <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Clean HTML</span>
