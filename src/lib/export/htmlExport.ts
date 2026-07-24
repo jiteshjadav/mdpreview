@@ -43,9 +43,9 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
   <header class="doc-header">
     <div class="header-container">
       <div class="brand">
-        <button id="tocToggleBtn" class="btn-toc-toggle" title="Toggle Table of Contents">
-          <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-          Menu
+        <button id="tocToggleBtn" class="btn-toc-toggle" title="Toggle Page Index">
+          <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
+          Index
         </button>
 
         ${files.length > 1 ? `

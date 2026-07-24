@@ -23,6 +23,21 @@
    Controls shareable attributes (page width, margins,
    padding, shadows, component radii) across all themes.
 ══════════════════════════════════════════════════════ */
+/* Smooth Scroll & Precise Heading Offset for Index Anchor Links */
+html {
+  scroll-behavior: smooth !important;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6,
+.markdown-body [id] {
+  scroll-margin-top: 4.25rem !important;
+}
+
 :root {
   /* Centralized Layout & Balanced Side Gap Variables for Preview and Exported Pages */
   --doc-max-width-header: 96%;
@@ -259,12 +274,16 @@ html[data-layout="column"] #tocToggleBtn {
                  column themes: completely hidden
 ══════════════════════════════════════════════════════ */
 
-/* Base reset — remove per-theme decorations */
+/* Base reset — standardize position and top offset alignment */
 .toc-sidebar {
+  position: sticky !important;
+  top: 5.25rem !important;
+  height: fit-content !important;
+  max-height: calc(100vh - 6.5rem) !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  margin-top: 1.5rem !important;
   background: #ffffff !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  overflow: hidden !important;
 }
 
 /* Column themes: sidebar doesn't exist */
