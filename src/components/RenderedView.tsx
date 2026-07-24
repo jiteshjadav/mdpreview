@@ -3,8 +3,8 @@
 import React, { useEffect } from 'react';
 import mermaid from 'mermaid';
 import { ParseResult } from '@/lib/engine/converter';
-
 import { ThemeType } from './ThemeSwitcher';
+import { SplitEditorView } from './SplitEditorView';
 
 export interface RenderedViewProps {
   parseResult: ParseResult;
@@ -23,6 +23,7 @@ export function RenderedView({
   onContentChange,
   selectedTheme = 'split-book',
 }: RenderedViewProps) {
+
 
   // Dynamically load document presentation layout theme CSS file when selectedTheme changes
   useEffect(() => {
@@ -95,36 +96,15 @@ export function RenderedView({
 
   if (isEditing) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 min-h-[450px] sm:min-h-[600px] mb-10 mt-14 sm:mt-16">
-        {/* Editor Panel Left */}
-        <div className="flex flex-col gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-4.5 shadow-sm transition-colors">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-400 dark:text-slate-500 pb-2 border-b border-slate-100 dark:border-slate-800">
-            <span>Live Editor</span>
-            <span className="font-mono text-[10px] truncate max-w-[150px] xs:max-w-[200px]">{filename}</span>
-          </div>
-          <textarea
-            value={rawMarkdown}
-            onChange={(e) => onContentChange(e.target.value)}
-            placeholder="Type or paste Markdown here..."
-            className="flex-1 min-h-[320px] sm:min-h-[500px] w-full p-3 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-900 font-mono text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none leading-relaxed transition-all shadow-inner"
-          />
-        </div>
-
-        {/* Live Preview Panel Right */}
-        <div
-          style={{
-            backgroundColor: docBgColor,
-            color: docTextColor,
-            borderColor: docBorderColor
-          }}
-          className="border rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm transition-colors overflow-auto max-h-[500px] sm:max-h-[650px]"
-        >
-          <article
-            className="markdown-body leading-relaxed space-y-4"
-            dangerouslySetInnerHTML={{ __html: parseResult.html }}
-          />
-        </div>
-      </div>
+      <SplitEditorView
+        parseResult={parseResult}
+        rawMarkdown={rawMarkdown}
+        filename={filename}
+        onContentChange={onContentChange}
+        docBgColor={docBgColor}
+        docTextColor={docTextColor}
+        docBorderColor={docBorderColor}
+      />
     );
   }
 
