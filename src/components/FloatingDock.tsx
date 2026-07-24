@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Copy, Printer, Check, Edit3, ArrowLeft, Eye, FileText, Globe, HelpCircle, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Download, Copy, Printer, Check, Edit3, ArrowLeft, Eye, FileText, Globe, HelpCircle, MoreVertical, ChevronLeft, ChevronRight, FolderOpen } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import JSZip from 'jszip';
 import { ParseResult } from '@/lib/engine/converter';
@@ -295,13 +295,13 @@ export function FloatingDock({
  
           <div className="hidden sm:block w-[1px] h-5 app-border shrink-0" />
  
-          {/* Direct File Upload */}
+          {/* Direct File Opening */}
           <label
             className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer shrink-0 border app-bg-hover app-border app-text select-none"
-            title="Upload files to workspace"
+            title="Open local files in workspace"
           >
-            <Download className="w-4 h-4 app-accent-text rotate-180" />
-            <span>{lang === 'en' ? 'Upload' : 'Charger'}</span>
+            <FolderOpen className="w-4 h-4 app-accent-text" />
+            <span>{lang === 'en' ? 'Open' : 'Ouvrir'}</span>
             <input
               type="file"
               multiple

@@ -1,6 +1,6 @@
 export interface ExportOptions {
   title?: string;
-  theme?: 'split-book' | 'dashboard-deck' | 'stepped-progress' | 'warm-editorial' | 'clean-html';
+  theme?: 'split-book' | 'dashboard-deck' | 'stepped-progress' | 'warm-editorial' | 'sapphire-spec' | 'enterprise-blue' | 'clean-html';
   includeToc?: boolean;
   files?: { id: string; name: string }[];
   activeFileName?: string;
@@ -9,7 +9,7 @@ export interface ExportOptions {
 // Grid-capable themes have a two-column doc-wrapper with a collapsible TOC sidebar.
 // All other themes use a single-column layout (no sidebar).
 // When adding a new grid-capable theme, add its ID here AND to GRID_THEMES in doc-interaction.js.
-const GRID_THEMES = new Set(['split-book', 'dashboard-deck', 'stepped-progress']);
+const GRID_THEMES = new Set(['split-book', 'dashboard-deck', 'stepped-progress', 'sapphire-spec', 'enterprise-blue']);
 
 export function generateStandaloneHtml(htmlContent: string, options: ExportOptions = {}): string {
   const title = options.title || 'Exported Documentation';
@@ -33,8 +33,8 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- chrome.css: shared header, sidebar, TOC, buttons — same across all themes -->
-  <link rel="stylesheet" href="${baseUrl}/themes/pages/chrome.css">
+  <!-- doc-framework.css: shared layout tokens, header, sidebar, TOC, buttons — same across all themes -->
+  <link rel="stylesheet" href="${baseUrl}/themes/pages/shared/doc-framework.css">
   <!-- theme CSS: content typography, body bg, doc-wrapper layout only -->
   <link rel="stylesheet" href="${baseUrl}/themes/pages/${theme}.css" data-role="theme-css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
@@ -107,6 +107,10 @@ export function generateStandaloneHtml(htmlContent: string, options: ExportOptio
               <button class="layout-option-btn" data-theme-val="warm-editorial" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
                 <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Warm Editorial</span>
                 <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Serif magazine style</span>
+              </button>
+              <button class="layout-option-btn" data-theme-val="sapphire-spec" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
+                <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Sapphire Spec</span>
+                <span style="font-size: 10px; color: #94a3b8; font-weight: 400;">Executive corporate sapphire layout</span>
               </button>
               <button class="layout-option-btn" data-theme-val="clean-html" style="border: none; background: none; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; cursor: pointer; font-family: Inter, system-ui, sans-serif; text-align: left;">
                 <span style="font-size: 12px; font-weight: 600; color: #0f172a;">Clean HTML</span>

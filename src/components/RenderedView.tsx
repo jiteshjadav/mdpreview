@@ -28,6 +28,17 @@ export function RenderedView({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const themeId = selectedTheme || 'split-book';
+
+      // Load shared doc-framework.css for consistent component rendering across app preview and export
+      let frameworkLinkEl = document.getElementById('preview-doc-framework-stylesheet') as HTMLLinkElement;
+      if (!frameworkLinkEl) {
+        frameworkLinkEl = document.createElement('link');
+        frameworkLinkEl.id = 'preview-doc-framework-stylesheet';
+        frameworkLinkEl.rel = 'stylesheet';
+        frameworkLinkEl.href = '/themes/pages/shared/doc-framework.css';
+        document.head.appendChild(frameworkLinkEl);
+      }
+
       let linkEl = document.getElementById('preview-doc-theme-stylesheet') as HTMLLinkElement;
       if (!linkEl) {
         linkEl = document.createElement('link');
@@ -37,7 +48,7 @@ export function RenderedView({
       }
       linkEl.href = `/themes/pages/${themeId}.css`;
       document.documentElement.setAttribute('data-theme', themeId);
-      const gridCapable = ['split-book', 'dashboard-deck', 'stepped-progress'].includes(themeId);
+      const gridCapable = ['split-book', 'dashboard-deck', 'stepped-progress', 'sapphire-spec', 'enterprise-blue'].includes(themeId);
       document.documentElement.setAttribute('data-layout', gridCapable ? 'grid' : 'column');
     }
   }, [selectedTheme]);
@@ -52,12 +63,12 @@ export function RenderedView({
         });
         
         // Find elements that have not been compiled into SVG elements yet
-        const unrenderedNodes = Array.from(document.querySelectorAll('.mermaid-zoom-wrapper pre.mermaid')).filter(
+        const unrenderedNodes = Array.from(document.querySelectorAll('.doc-mermaid.mermaid')).filter(
           (el) => !el.hasAttribute('data-processed') && el.querySelector('svg') === null
         );
 
         if (unrenderedNodes.length === 0) {
-          setupZoomPan();
+          setupMermaidViewers();
           return;
         }
 
@@ -65,13 +76,13 @@ export function RenderedView({
         mermaid.run({
           nodes: unrenderedNodes as HTMLElement[],
         }).then(() => {
-          setupZoomPan();
-        }).catch(() => {
-          // Catch errors silently if elements are unmounted or already processed
-          setupZoomPan();
+          setupMermaidViewers();
+        }).catch((err) => {
+          console.error('Mermaid render error:', err);
+          setupMermaidViewers();
         });
       } catch (e) {
-        // Safe catch
+        console.error('Mermaid setup error:', e);
       }
     }
   }, [parseResult.html, isEditing, selectedTheme]);
@@ -119,7 +130,7 @@ export function RenderedView({
         color: 'var(--text-color, #1a1a1a)',
         borderColor: 'var(--border-color, #e5e5e5)' 
       }}
-      className="w-full max-w-[1320px] mx-auto border rounded-3xl pt-5 pb-10 px-4 sm:pt-8 sm:pb-16 sm:px-14 shadow-sm transition-all duration-300 min-h-[450px] sm:min-h-[550px] mb-10"
+      className="w-full max-w-[1680px] mx-auto border rounded-3xl mt-6 sm:mt-8 pt-6 pb-10 px-4 sm:pt-8 sm:pb-12 sm:px-10 shadow-sm transition-all duration-300 min-h-[450px] sm:min-h-[550px] mb-10"
     >
       <article
         className="markdown-body leading-relaxed space-y-4"
@@ -129,112 +140,103 @@ export function RenderedView({
   );
 }
 
-// Attach zoom and pan controllers dynamically
-function setupZoomPan() {
-  document.querySelectorAll('.mermaid-pan-zoom-container').forEach((el) => {
-    const container = el as HTMLElement;
-    const wrapper = container.querySelector('.mermaid-zoom-wrapper') as HTMLDivElement;
-    if (!wrapper) return;
+// Attach zoom and pan controllers dynamically to mermaid viewers
+function setupMermaidViewers() {
+  const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, min), max);
+
+  document.querySelectorAll('[data-doc-mermaid-viewer]').forEach((viewerEl) => {
+    const viewer = viewerEl as HTMLElement;
+    if (viewer.dataset.mermaidViewerReady === 'true') return;
+
+    const canvas = viewer.querySelector('.doc-mermaid-canvas') as HTMLElement;
+    const diagram = viewer.querySelector('.doc-mermaid') as HTMLElement;
+
+    if (!canvas || !diagram || !diagram.querySelector('svg')) return;
+
+    viewer.dataset.mermaidViewerReady = 'true';
 
     let scale = 1;
-    let translateX = 0;
-    let translateY = 0;
+    let x = 0;
+    let y = 0;
     let isDragging = false;
-    let startX = 0;
-    let startY = 0;
+    let lastX = 0;
+    let lastY = 0;
 
-    const updateTransform = () => {
-      wrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    const zoomTextEl = viewer.querySelector('[data-mermaid-zoom-indicator]') as HTMLElement;
+
+    const applyTransform = () => {
+      diagram.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+      const zoomPct = `${Math.round(scale * 100)}%`;
+      viewer.dataset.zoom = zoomPct;
+      if (zoomTextEl) zoomTextEl.textContent = zoomPct;
     };
 
-    const zoomInBtn = container.querySelector('.zoom-in-btn') as HTMLButtonElement;
-    const zoomOutBtn = container.querySelector('.zoom-out-btn') as HTMLButtonElement;
-    const resetBtn = container.querySelector('.zoom-reset-btn') as HTMLButtonElement;
+    const reset = () => {
+      scale = 1;
+      x = 0;
+      y = 0;
+      applyTransform();
+    };
 
-    if (zoomInBtn) {
-      zoomInBtn.onclick = (e) => {
-        e.stopPropagation();
-        scale = Math.min(scale + 0.15, 8);
-        updateTransform();
-      };
-    }
+    const zoom = (delta: number, originX = canvas.clientWidth / 2, originY = canvas.clientHeight / 2) => {
+      const prevScale = scale;
+      scale = clamp(scale + delta, 0.4, 4);
+      const ratio = scale / prevScale;
+      x = originX - (originX - x) * ratio;
+      y = originY - (originY - y) * ratio;
+      applyTransform();
+    };
 
-    if (zoomOutBtn) {
-      zoomOutBtn.onclick = (e) => {
-        e.stopPropagation();
-        scale = Math.max(scale - 0.15, 0.4);
-        updateTransform();
-      };
-    }
+    viewer.addEventListener('click', (event) => {
+      const target = event.target as Element;
+      const button = target ? target.closest('[data-mermaid-action]') as HTMLButtonElement : null;
+      if (!button) return;
 
-    if (resetBtn) {
-      resetBtn.onclick = (e) => {
-        e.stopPropagation();
-        scale = 1;
-        translateX = 0;
-        translateY = 0;
-        updateTransform();
-      };
-    }
-
-    const fullscreenBtn = container.querySelector('.zoom-fullscreen-btn') as HTMLButtonElement;
-    if (fullscreenBtn) {
-      fullscreenBtn.onclick = (e) => {
-        e.stopPropagation();
-        container.classList.toggle('fullscreen-active');
-        scale = 1;
-        translateX = 0;
-        translateY = 0;
-        updateTransform();
-        if (container.classList.contains('fullscreen-active')) {
-          fullscreenBtn.title = "Exit Fullscreen";
-          fullscreenBtn.innerText = "✕";
+      const action = button.dataset.mermaidAction;
+      if (action === 'zoom-in') zoom(0.15);
+      if (action === 'zoom-out') zoom(-0.15);
+      if (action === 'reset') reset();
+      if (action === 'fullscreen') {
+        if (document.fullscreenElement === viewer) {
+          document.exitFullscreen().catch(() => {});
         } else {
-          fullscreenBtn.title = "Toggle Fullscreen";
-          fullscreenBtn.innerText = "⛶";
+          viewer.requestFullscreen().catch(() => {});
         }
-      };
-    }
-
-    // Wheel zooming
-    const wheelHandler = (e: any) => {
-      e.preventDefault();
-      const zoomFactor = 0.08;
-      if (e.deltaY < 0) {
-        scale = Math.min(scale + zoomFactor, 8);
-      } else {
-        scale = Math.max(scale - zoomFactor, 0.4);
       }
-      updateTransform();
-    };
+    });
 
-    container.addEventListener('wheel', wheelHandler, { passive: false });
+    canvas.addEventListener('wheel', (event: WheelEvent) => {
+      event.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      zoom(event.deltaY < 0 ? 0.12 : -0.12, event.clientX - rect.left, event.clientY - rect.top);
+    }, { passive: false });
 
-    // Drag panning
-    const mouseDownHandler = (e: any) => {
-      if (e.target.closest('.absolute')) return;
+    canvas.addEventListener('pointerdown', (event: PointerEvent) => {
       isDragging = true;
-      startX = e.clientX - translateX;
-      startY = e.clientY - translateY;
-      container.style.cursor = 'grabbing';
-    };
+      lastX = event.clientX;
+      lastY = event.clientY;
+      canvas.setPointerCapture(event.pointerId);
+    });
 
-    const mouseMoveHandler = (e: any) => {
+    canvas.addEventListener('pointermove', (event: PointerEvent) => {
       if (!isDragging) return;
-      translateX = e.clientX - startX;
-      translateY = e.clientY - startY;
-      updateTransform();
-    };
+      x += event.clientX - lastX;
+      y += event.clientY - lastY;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      applyTransform();
+    });
 
-    const mouseUpHandler = () => {
+    const stopDragging = (event: PointerEvent) => {
       if (isDragging) {
         isDragging = false;
-        container.style.cursor = 'grab';
+        try { canvas.releasePointerCapture(event.pointerId); } catch (_) {}
       }
     };
 
-    container.addEventListener('mousedown', mouseDownHandler);
-    window.addEventListener('mousemove', mouseMoveHandler);
-    window.addEventListener('mouseup', mouseUpHandler);
+    canvas.addEventListener('pointerup', stopDragging);
+    canvas.addEventListener('pointercancel', stopDragging);
+
+    applyTransform();
   });
 }

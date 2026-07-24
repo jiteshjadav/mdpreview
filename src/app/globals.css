@@ -184,8 +184,8 @@
   padding: 1.25rem;
   overflow-x: auto;
   margin: 1.5rem 0;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.28), 0 6px 20px -2px rgba(7, 71, 139, 0.35) !important;
 }
 
 /* Intentionally removed: .dark .markdown-body pre override.
@@ -436,28 +436,16 @@
   max-height: 95vh !important;
 }
 
-/* In dark mode */
-.dark .mermaid-pan-zoom-container {
+/* In dark document page theme */
+[data-theme="dark"] .mermaid-pan-zoom-container,
+[data-theme="midnight-dark"] .mermaid-pan-zoom-container {
   background: #090d16;
   border-color: #1e293b;
 }
 
-.dark .mermaid-pan-zoom-container.fullscreen-active {
+[data-theme="dark"] .mermaid-pan-zoom-container.fullscreen-active,
+[data-theme="midnight-dark"] .mermaid-pan-zoom-container.fullscreen-active {
   background: rgba(11, 15, 25, 0.98) !important;
-}
-
-.dark .mermaid-pan-zoom-container .absolute.top-2.right-2 {
-  background: rgba(17, 24, 39, 0.9) !important;
-  border-color: rgba(30, 41, 59, 0.8) !important;
-}
-
-.dark .mermaid-pan-zoom-container .absolute.top-2.right-2 button {
-  color: #94a3b8 !important;
-}
-
-.dark .mermaid-pan-zoom-container .absolute.top-2.right-2 button:hover {
-  background: #1f2937 !important;
-  color: #f8fafc !important;
 }
 
 @keyframes fadeInFullscreen {

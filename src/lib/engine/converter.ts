@@ -179,25 +179,33 @@ function transformMermaidBlocks(html: string): string {
   // Find all <pre><code class="language-mermaid">...</code></pre> patterns
   const regex = /<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/gi;
   return html.replace(regex, (match, code) => {
-    // Decode HTML entities
+    // Decode HTML entities safely
     const decodedCode = code
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"')
-      .replace(/&#039;/g, "'");
+      .replace(/&#039;/g, "'")
+      .replace(/&#x27;/g, "'")
+      .replace(/&#x2F;/g, '/');
 
-    return `<div class="mermaid-pan-zoom-container select-none relative overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center p-4 cursor-grab active:cursor-grabbing my-6" style="height: 680px; width: 100%;">
-      <div class="mermaid-zoom-wrapper transition-transform duration-100 ease-out origin-center scale-100 translate-x-0 translate-y-0" style="transform: scale(1) translate(0px, 0px);">
-        <pre class="mermaid bg-transparent border-none shadow-none m-0 p-0 overflow-visible">${decodedCode}</pre>
+    return `<figure class="doc-mermaid-viewer" data-doc-mermaid-viewer data-zoom="100%">
+      <div class="doc-mermaid-toolbar" aria-label="Diagram controls">
+        <span>Diagram</span>
+        <div class="doc-mermaid-actions">
+          <button type="button" data-mermaid-action="zoom-out" aria-label="Zoom out">-</button>
+          <button type="button" data-mermaid-action="zoom-in" aria-label="Zoom in">+</button>
+          <button type="button" data-mermaid-action="reset">Reset</button>
+          <button type="button" data-mermaid-action="fullscreen">Fullscreen</button>
+        </div>
       </div>
-      <div class="absolute top-2 right-2 flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur border border-slate-200 dark:border-slate-800 rounded-lg p-1 text-[10px] text-slate-500 font-semibold shadow-sm print:hidden z-10">
-        <button class="zoom-in-btn hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded transition-colors" title="Zoom In" style="cursor: pointer;">＋</button>
-        <button class="zoom-out-btn hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded transition-colors" title="Zoom Out" style="cursor: pointer;">－</button>
-        <button class="zoom-reset-btn hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded transition-colors" title="Reset" style="cursor: pointer;">Reset</button>
-        <button class="zoom-fullscreen-btn hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded transition-colors" title="Toggle Fullscreen" style="cursor: pointer;">⛶</button>
+      <div class="doc-mermaid-canvas" role="group" aria-label="Interactive Mermaid diagram" tabindex="0">
+        <div class="doc-mermaid mermaid">${decodedCode}</div>
       </div>
-    </div>`;
+      <div class="doc-mermaid-footer">
+        <span class="doc-mermaid-zoom-text" data-mermaid-zoom-indicator>100%</span>
+      </div>
+    </figure>`;
   });
 }
 

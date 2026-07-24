@@ -36,8 +36,8 @@ body.theme-body {
 }
 
 .header-container {
-  max-width: 1320px;
-  width: 92%;
+  max-width: var(--doc-max-width-header);
+  width: var(--doc-wrapper-width);
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -61,8 +61,8 @@ body.theme-body {
 .btn-action:hover { background: var(--card-bg-hover); border-color: var(--primary); }
 
 .doc-wrapper {
-  max-width: 1320px;
-  width: 92%;
+  max-width: var(--doc-max-width-grid);
+  width: var(--doc-wrapper-width);
   margin: 2.5rem auto;
   display: grid;
   grid-template-columns: 260px 1fr;

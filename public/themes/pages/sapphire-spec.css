@@ -1,0 +1,229 @@
+/* Layout F: Sapphire Spec (SDK & API Docs Layout) */
+:root {
+  --bg-color: #f4f7fb;
+  --card-bg: #ffffff;
+  --surface-alt: #ebf3fb;
+  --text-color: #091e42;
+  --text-muted: #42526e;
+  --border-color: #c0d6ec;
+
+  /* Executive Corporate Sapphire (#07478b) Theme Tokens */
+  --primary: #07478b;
+  --primary-soft: #ebf3fb;
+  --primary-strong: #07478b;
+  --primary-gradient: #093c74;
+  --h1-gradient: linear-gradient(135deg, #05366d 0%, #07478b 55%, #0b54a4 100%);
+  --page-glow: rgba(7, 71, 139, 0.08);
+  --page-glow: rgba(7, 71, 139, 0.12);
+  --shadow-sm: 0 16px 40px -4px rgba(0, 0, 0, 0.12), 0 8px 24px -2px rgba(7, 71, 139, 0.18);
+
+  /* Status Colors */
+  --green: #059669; --green-bg: rgba(5, 150, 105, 0.08); --green-border: rgba(5, 150, 105, 0.2);
+  --amber: #d97706; --amber-bg: rgba(217, 119, 6, 0.08); --amber-border: rgba(217, 119, 6, 0.2);
+  --red: #dc2626;   --red-bg: rgba(220, 38, 38, 0.08);   --red-border: rgba(220, 38, 38, 0.2);
+  --blue: #07478b;  --blue-bg: rgba(7, 71, 139, 0.08);  --blue-border: rgba(7, 71, 139, 0.2);
+}
+
+body.theme-body {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background:
+    radial-gradient(circle at top left, var(--page-glow), transparent 36rem),
+    linear-gradient(180deg, #ffffff 0%, var(--bg-color) 34rem);
+  color: var(--text-color);
+  line-height: 1.65;
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.doc-wrapper {
+  max-width: var(--doc-max-width-grid);
+  width: var(--doc-wrapper-width);
+  margin: 1.5rem auto;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 992px) {
+  .doc-wrapper { grid-template-columns: 1fr; gap: 2rem; }
+  .toc-sidebar { display: none; }
+}
+
+/* Left Sidebar TOC with Rounded Corners & Elevated Double Shadow */
+.toc-sidebar {
+  position: sticky;
+  top: 5rem;
+  height: fit-content;
+  padding: 1.25rem;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.12), 0 8px 24px -2px rgba(7, 71, 139, 0.18);
+}
+
+.toc-header {
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.toc-nav ul { list-style: none; padding: 0; margin: 0; }
+.toc-nav li { margin-bottom: 0.5rem; font-size: 0.85rem; }
+.toc-nav li.level-h3 { padding-left: 0.85rem; }
+.toc-nav a { color: var(--text-muted); text-decoration: none; transition: color 0.15s; font-weight: 500; }
+.toc-nav a:hover { color: var(--primary); }
+
+.main-content { min-width: 0; }
+
+.markdown-body {
+  font-size: 1rem;
+}
+
+/* Sapphire Executive Banner Headings with Prominent Shadow */
+.markdown-body h1 {
+  background: var(--h1-gradient);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px -4px rgba(7, 71, 139, 0.38), 0 6px 18px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff !important;
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  padding: 16px 24px;
+  margin-top: 0.25rem;
+  margin-bottom: 1.75rem;
+  font-weight: 800;
+  position: relative;
+  overflow: hidden;
+}
+
+.markdown-body h1::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.4), transparent 80%);
+}
+
+.markdown-body h2 {
+  border-bottom: 1px solid var(--border-color);
+  color: var(--primary-strong);
+  font-size: 1.55rem;
+  line-height: 1.25;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 10px;
+  font-weight: 700;
+}
+
+.markdown-body h3 {
+  color: var(--text-color);
+  font-size: 1.18rem;
+  line-height: 1.35;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.markdown-body h4 {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.markdown-body p,
+.markdown-body li {
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.markdown-body strong {
+  color: var(--text-color);
+}
+
+.markdown-body code {
+  background: var(--primary-soft);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--primary-strong);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.9em;
+  padding: 2px 6px;
+  box-shadow: 0 2px 6px rgba(7, 71, 139, 0.12);
+}
+
+/* Deep Visible Code Block Shadow */
+.markdown-body pre {
+  box-shadow: 0 20px 45px -6px rgba(0, 0, 0, 0.38), 0 8px 24px -2px rgba(7, 71, 139, 0.25) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(192, 214, 236, 0.4) !important;
+}
+
+.markdown-body blockquote {
+  background: var(--primary-soft);
+  border-left: 4px solid var(--primary);
+  border-radius: 10px;
+  color: var(--primary-strong);
+  padding: 14px 18px;
+  margin: 1.25rem 0;
+  box-shadow: 0 10px 28px -4px rgba(0, 0, 0, 0.08), 0 4px 14px rgba(7, 71, 139, 0.14);
+}
+
+/* Images & Diagrams Elevation */
+.markdown-body img,
+.doc-mermaid-container {
+  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.15), 0 8px 24px -2px rgba(7, 71, 139, 0.18);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+/* API Data Tables with Rounded Corner Design & Deep Shadow */
+.table-container {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.12), 0 8px 24px -2px rgba(7, 71, 139, 0.18);
+  border: 1px solid var(--border-color);
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.markdown-body th {
+  background: var(--primary-strong);
+  color: #ffffff;
+  font-weight: 700;
+  text-align: left;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  font-size: 0.92rem;
+}
+
+.markdown-body td {
+  border: 1px solid var(--border-color);
+  padding: 14px 16px;
+  color: var(--text-muted);
+  background: #ffffff;
+  font-size: 0.92rem;
+  vertical-align: top;
+}
+
+.markdown-body tr:nth-child(even) td {
+  background: #f8fafc;
+}

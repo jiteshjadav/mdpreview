@@ -66,7 +66,7 @@
   // Grid-capable themes: these use a 2-column doc-wrapper with a collapsible TOC sidebar.
   // All other themes get data-layout="column" (no sidebar).
   // To register a new grid-capable theme, add its ID here.
-  var GRID_THEMES = ['split-book', 'dashboard-deck', 'stepped-progress'];
+  var GRID_THEMES = ['split-book', 'dashboard-deck', 'stepped-progress', 'sapphire-spec', 'enterprise-blue', 'api-docs'];
 
   function getLayout(themeId) {
     return GRID_THEMES.indexOf(themeId) !== -1 ? 'grid' : 'column';
@@ -110,7 +110,7 @@
       }
     });
 
-    // Swap only the theme-specific CSS link (not chrome.css)
+    // Swap only the theme-specific CSS link (not doc-framework.css)
     var themeLink = document.querySelector('link[data-role="theme-css"]');
     if (themeLink) {
       var href = themeLink.getAttribute('href');
@@ -166,114 +166,117 @@
   }
 
   // Setup Zoom & Pan for Mermaid Diagrams
-  function setupMermaidZoomPan() {
-    document.querySelectorAll('.mermaid-pan-zoom-container').forEach(function(container) {
-      var wrapper = container.querySelector('.mermaid-zoom-wrapper');
-      if (!wrapper) return;
+  function setupMermaidViewers() {
+    var clamp = function(val, min, max) { return Math.min(Math.max(val, min), max); };
+
+    document.querySelectorAll('[data-doc-mermaid-viewer]').forEach(function(viewer) {
+      if (viewer.dataset.mermaidViewerReady === 'true') return;
+
+      var canvas = viewer.querySelector('.doc-mermaid-canvas');
+      var diagram = viewer.querySelector('.doc-mermaid');
+
+      if (!canvas || !diagram || !diagram.querySelector('svg')) return;
+
+      viewer.dataset.mermaidViewerReady = 'true';
 
       var scale = 1;
-      var translateX = 0;
-      var translateY = 0;
+      var x = 0;
+      var y = 0;
       var isDragging = false;
-      var startX = 0;
-      var startY = 0;
+      var lastX = 0;
+      var lastY = 0;
 
-      function updateTransform() {
-        wrapper.style.transform = 'translate(' + translateX + 'px, ' + translateY + 'px) scale(' + scale + ')';
+      var zoomTextEl = viewer.querySelector('[data-mermaid-zoom-indicator]');
+
+      function applyTransform() {
+        diagram.style.transform = 'translate(' + x + 'px, ' + y + 'px) scale(' + scale + ')';
+        var zoomPct = Math.round(scale * 100) + '%';
+        viewer.dataset.zoom = zoomPct;
+        if (zoomTextEl) zoomTextEl.textContent = zoomPct;
       }
 
-      var zoomInBtn = container.querySelector('.zoom-in-btn');
-      var zoomOutBtn = container.querySelector('.zoom-out-btn');
-      var resetBtn = container.querySelector('.zoom-reset-btn');
-
-      if (zoomInBtn) {
-        zoomInBtn.onclick = function(e) {
-          e.stopPropagation();
-          scale = Math.min(scale + 0.15, 8);
-          updateTransform();
-        };
+      function reset() {
+        scale = 1;
+        x = 0;
+        y = 0;
+        applyTransform();
       }
 
-      if (zoomOutBtn) {
-        zoomOutBtn.onclick = function(e) {
-          e.stopPropagation();
-          scale = Math.max(scale - 0.15, 0.4);
-          updateTransform();
-        };
+      function zoom(delta, originX, originY) {
+        if (originX === undefined) originX = canvas.clientWidth / 2;
+        if (originY === undefined) originY = canvas.clientHeight / 2;
+        var prevScale = scale;
+        scale = clamp(scale + delta, 0.4, 4);
+        var ratio = scale / prevScale;
+        x = originX - (originX - x) * ratio;
+        y = originY - (originY - y) * ratio;
+        applyTransform();
       }
 
-      if (resetBtn) {
-        resetBtn.onclick = function(e) {
-          e.stopPropagation();
-          scale = 1;
-          translateX = 0;
-          translateY = 0;
-          updateTransform();
-        };
-      }
+      viewer.addEventListener('click', function(event) {
+        var target = event.target;
+        var button = target ? target.closest('[data-mermaid-action]') : null;
+        if (!button) return;
 
-      var fullscreenBtn = container.querySelector('.zoom-fullscreen-btn');
-      if (fullscreenBtn) {
-        fullscreenBtn.onclick = function(e) {
-          e.stopPropagation();
-          container.classList.toggle('fullscreen-active');
-          scale = 1;
-          translateX = 0;
-          translateY = 0;
-          updateTransform();
-          if (container.classList.contains('fullscreen-active')) {
-            fullscreenBtn.title = "Exit Fullscreen";
-            fullscreenBtn.innerText = "✕";
+        var action = button.dataset.mermaidAction;
+        if (action === 'zoom-in') zoom(0.15);
+        if (action === 'zoom-out') zoom(-0.15);
+        if (action === 'reset') reset();
+        if (action === 'fullscreen') {
+          if (document.fullscreenElement === viewer) {
+            if (document.exitFullscreen) document.exitFullscreen();
           } else {
-            fullscreenBtn.title = "Toggle Fullscreen";
-            fullscreenBtn.innerText = "⛶";
+            if (viewer.requestFullscreen) viewer.requestFullscreen();
           }
-        };
-      }
-
-      container.addEventListener('wheel', function(e) {
-        e.preventDefault();
-        var zoomFactor = 0.08;
-        if (e.deltaY < 0) {
-          scale = Math.min(scale + zoomFactor, 8);
-        } else {
-          scale = Math.max(scale - zoomFactor, 0.4);
         }
-        updateTransform();
+      });
+
+      canvas.addEventListener('wheel', function(event) {
+        event.preventDefault();
+        var rect = canvas.getBoundingClientRect();
+        zoom(event.deltaY < 0 ? 0.12 : -0.12, event.clientX - rect.left, event.clientY - rect.top);
       }, { passive: false });
 
-      container.addEventListener('mousedown', function(e) {
-        if (e.target.closest('.absolute')) return;
+      canvas.addEventListener('pointerdown', function(event) {
         isDragging = true;
-        startX = e.clientX - translateX;
-        startY = e.clientY - translateY;
-        container.style.cursor = 'grabbing';
+        lastX = event.clientX;
+        lastY = event.clientY;
+        if (canvas.setPointerCapture) canvas.setPointerCapture(event.pointerId);
       });
 
-      window.addEventListener('mousemove', function(e) {
+      canvas.addEventListener('pointermove', function(event) {
         if (!isDragging) return;
-        translateX = e.clientX - startX;
-        translateY = e.clientY - startY;
-        updateTransform();
+        x += event.clientX - lastX;
+        y += event.clientY - lastY;
+        lastX = event.clientX;
+        lastY = event.clientY;
+        applyTransform();
       });
 
-      window.addEventListener('mouseup', function() {
+      function stopDragging(event) {
         if (isDragging) {
           isDragging = false;
-          container.style.cursor = 'grab';
+          if (canvas.releasePointerCapture) {
+            try { canvas.releasePointerCapture(event.pointerId); } catch (_) {}
+          }
         }
-      });
+      }
+
+      canvas.addEventListener('pointerup', stopDragging);
+      canvas.addEventListener('pointercancel', stopDragging);
+
+      applyTransform();
     });
   }
 
   // Load and Run Mermaid dynamically from CDN inside exported HTML file
-  if (document.querySelector('.mermaid')) {
+  if (document.querySelector('.doc-mermaid.mermaid')) {
     var script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js';
     script.onload = function() {
       window.mermaid.initialize({ startOnLoad: false, theme: 'default' });
-      window.mermaid.run({ querySelector: '.mermaid' }).then(function() {
-        setupMermaidZoomPan();
+      window.mermaid.run({ querySelector: '.doc-mermaid.mermaid' }).then(function() {
+        setupMermaidViewers();
       });
     };
     document.head.appendChild(script);

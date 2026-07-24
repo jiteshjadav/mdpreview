@@ -8,6 +8,8 @@ export type ThemeType =
   | 'dashboard-deck' 
   | 'stepped-progress'
   | 'warm-editorial'
+  | 'sapphire-spec'
+  | 'enterprise-blue'
   | 'clean-html';
 
 export interface ThemeOption {
@@ -43,6 +45,12 @@ export const THEME_OPTIONS: ThemeOption[] = [
     previewColor: 'bg-amber-50 border-orange-200 text-orange-900',
   },
   {
+    id: 'sapphire-spec',
+    name: 'Sapphire Spec',
+    description: 'Executive corporate sapphire layout for technical documentation',
+    previewColor: 'bg-blue-950 border-blue-600 text-blue-200',
+  },
+  {
     id: 'clean-html',
     name: 'Clean HTML',
     description: 'Simple web document style (GitHub Pages / MDX default)',
@@ -71,6 +79,7 @@ export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, 
     if (id === 'dashboard-deck') return lang === 'en' ? 'Dashboard Deck' : 'Tableau de Bord';
     if (id === 'stepped-progress') return lang === 'en' ? 'Stepped Guide' : 'Guide par Étapes';
     if (id === 'warm-editorial') return lang === 'en' ? 'Warm Editorial' : 'Éditorial Chaleureux';
+    if (id === 'sapphire-spec' || id === 'enterprise-blue') return lang === 'en' ? 'Sapphire Spec' : 'Spécification Saphir';
     return lang === 'en' ? 'Clean HTML' : 'HTML Simple';
   };
 
@@ -79,6 +88,7 @@ export function ThemeSwitcher({ currentTheme, onThemeChange, isNearTop = false, 
     if (id === 'dashboard-deck') return lang === 'en' ? 'Modular floating widget cards with shadows' : 'Cartes widgets flottantes modulaires avec ombres';
     if (id === 'stepped-progress') return lang === 'en' ? 'Linear timeline axis with numbered step icons' : 'Axe chronologique linéaire avec étapes numérotées';
     if (id === 'warm-editorial') return lang === 'en' ? 'Human-friendly serif magazine style with warm tones' : 'Style magazine serif chaleureux et humain';
+    if (id === 'sapphire-spec' || id === 'enterprise-blue') return lang === 'en' ? 'Executive corporate sapphire layout for technical documentation' : 'Style de référence technique bleu saphir entreprise';
     return lang === 'en' ? 'Simple web document style (GitHub Pages / MDX)' : 'Style document web simple (GitHub Pages / MDX)';
   };
 

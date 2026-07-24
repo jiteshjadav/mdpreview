@@ -62,7 +62,7 @@ export const TRANSLATIONS = {
     appTheme: "App Theme",
     layout: "Layout",
     files: "Files",
-    upload: "Upload",
+    upload: "Open",
     viewing: "Viewing",
     copied: "Copied!",
     copy: "Copy",
@@ -99,7 +99,7 @@ export const TRANSLATIONS = {
     appTheme: "Thème de l'App",
     layout: "Mise en page",
     files: "Fichiers",
-    upload: "Importer",
+    upload: "Ouvrir",
     viewing: "Visualisation",
     copied: "Copié !",
     copy: "Copier",
@@ -166,6 +166,16 @@ export function WorkspaceApp({
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [workspaceName, setWorkspaceName] = useState<string>('untitled-workspace');
 
+  const handleDocThemeChange = (newTheme: ThemeType) => {
+    setSelectedTheme(newTheme);
+    try {
+      localStorage.setItem('mdpreview_doc_theme', newTheme);
+      document.cookie = `mdpreview_doc_theme=${newTheme}; path=/; max-age=31536000; SameSite=Lax`;
+    } catch (e) {
+      console.error('Failed to save document theme preference:', e);
+    }
+  };
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('mdpreview-app-theme') as AppTheme;
     if (savedTheme && ['teal', 'indigo', 'dark'].includes(savedTheme)) {
@@ -174,6 +184,24 @@ export function WorkspaceApp({
     const savedLang = localStorage.getItem('mdpreview-lang') as 'en' | 'fr';
     if (savedLang && ['en', 'fr'].includes(savedLang)) {
       setLang(savedLang);
+    }
+
+    // Load saved document layout theme selection from cookie or localStorage
+    const getCookie = (name: string): string | null => {
+      if (typeof document === 'undefined') return null;
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+      return null;
+    };
+
+    const cookieTheme = getCookie('mdpreview_doc_theme') as ThemeType;
+    const localTheme = (typeof window !== 'undefined' ? localStorage.getItem('mdpreview_doc_theme') : null) as ThemeType;
+    const savedDocTheme = cookieTheme || localTheme;
+    const validThemes: ThemeType[] = ['split-book', 'dashboard-deck', 'stepped-progress', 'warm-editorial', 'sapphire-spec', 'enterprise-blue', 'clean-html'];
+
+    if (savedDocTheme && validThemes.includes(savedDocTheme)) {
+      setSelectedTheme(savedDocTheme);
     }
 
     // Direct route initialization (if mode is editor or preview, load template automatically)
@@ -634,7 +662,7 @@ export function WorkspaceApp({
           parseResult={activeFile.parseResult!}
           filename={activeFile.name}
           selectedTheme={selectedTheme}
-          onThemeChange={setSelectedTheme}
+          onThemeChange={handleDocThemeChange}
           isEditing={isEditing}
           onToggleEdit={() => setIsEditing(!isEditing)}
           onBackToUpload={handleBackToUpload}
